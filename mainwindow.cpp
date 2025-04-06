@@ -93,3 +93,11 @@ void MainWindow::updateTotals()
 
 
 
+
+void MainWindow::on_buttonClearCart_clicked()
+{
+    cart.clear();                         // Clear the cart data
+    ui->tableCart->setRowCount(0);        // Clear the table
+    updateTotals();
+}
+
