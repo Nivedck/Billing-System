@@ -1,12 +1,20 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QDebug>
+
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    initializeProductCatalog();
+    connectToDatabase();
+    loadProductsFromDatabase();
+
 }
 
 MainWindow::~MainWindow()
@@ -14,33 +22,46 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::initializeProductCatalog() {
+void MainWindow::connectToDatabase() {
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("products.db");
 
+    if (!db.open()) {
+        qDebug() << "Error: Could not connect to database.";
+        return;
+    }
 
-    productCatalog[1] = {"Apple", 10.0};
-    productCatalog[2] = {"Milk", 25.0};
-    productCatalog[3] = {"Bread", 20.0};
-    productCatalog[4] = {"Eggs", 5.0};
-    productCatalog[5] = {"Butter", 40.0};
-    productCatalog[6] = {"Rice", 60.0};
-    productCatalog[7] = {"Sugar", 30.0};
-    productCatalog[8] = {"Salt", 15.0};
-    productCatalog[9] = {"Soap", 35.0};
-    productCatalog[0] = {"Tea", 50.0};
+    QSqlQuery query;
+    query.exec("CREATE TABLE IF NOT EXISTS products ("
+               "code INTEGER PRIMARY KEY, "
+               "name TEXT NOT NULL, "
+               "price REAL NOT NULL)");
+}
 
-    // Optional: display catalog in the left QTableWidget
-    for (auto it = productCatalog.begin(); it != productCatalog.end(); ++it) {
+void MainWindow::loadProductsFromDatabase()
+{
+    QSqlQuery query("SELECT code, name, price FROM products");
+    while (query.next()) {
+        int code = query.value(0).toInt();
+        QString name = query.value(1).toString();
+        double price = query.value(2).toDouble();
+
+        productCatalog[code] = {name, price};
+
         int row = ui->tableCatalog->rowCount();
         ui->tableCatalog->insertRow(row);
-        ui->tableCatalog->setItem(row, 0, new QTableWidgetItem(QString::number(it.key())));
-        ui->tableCatalog->setItem(row, 1, new QTableWidgetItem(it.value().name));
-        ui->tableCatalog->setItem(row, 2, new QTableWidgetItem(QString("₹ %1").arg(it.value().price, 0, 'f', 2)));
+        ui->tableCatalog->setItem(row, 0, new QTableWidgetItem(QString::number(code)));
+        ui->tableCatalog->setItem(row, 1, new QTableWidgetItem(name));
+        ui->tableCatalog->setItem(row, 2, new QTableWidgetItem(QString("₹ %1").arg(price, 0, 'f', 2)));
     }
 
     ui->tableCatalog->verticalHeader()->setVisible(false);
     ui->tableCatalog->setShowGrid(false);
-
 }
+
+
+
+
 
 void MainWindow::on_buttonAddToCart_clicked()
 {

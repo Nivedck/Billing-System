@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QMap>
+#include <QTableWidgetItem>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -30,10 +32,11 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QMap<int, Product> productCatalog;  // Key = Product Code
-    void initializeProductCatalog();    // Helper to fill catalog
     QMap<int, int> cart; // Key = Product Code, Value = Quantity
     void updateCartDisplay();
     void updateTotals();
+    void connectToDatabase();
+    void loadProductsFromDatabase();
 
 };
 #endif // MAINWINDOW_H
