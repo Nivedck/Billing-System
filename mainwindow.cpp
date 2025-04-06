@@ -15,16 +15,18 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::initializeProductCatalog() {
-    productCatalog[101] = {"Apple", 10.0};
-    productCatalog[102] = {"Milk", 25.0};
-    productCatalog[103] = {"Bread", 20.0};
-    productCatalog[104] = {"Eggs", 5.0};
-    productCatalog[105] = {"Butter", 40.0};
-    productCatalog[106] = {"Rice", 60.0};
-    productCatalog[107] = {"Sugar", 30.0};
-    productCatalog[108] = {"Salt", 15.0};
-    productCatalog[109] = {"Soap", 35.0};
-    productCatalog[110] = {"Tea", 50.0};
+
+
+    productCatalog[1] = {"Apple", 10.0};
+    productCatalog[2] = {"Milk", 25.0};
+    productCatalog[3] = {"Bread", 20.0};
+    productCatalog[4] = {"Eggs", 5.0};
+    productCatalog[5] = {"Butter", 40.0};
+    productCatalog[6] = {"Rice", 60.0};
+    productCatalog[7] = {"Sugar", 30.0};
+    productCatalog[8] = {"Salt", 15.0};
+    productCatalog[9] = {"Soap", 35.0};
+    productCatalog[0] = {"Tea", 50.0};
 
     // Optional: display catalog in the left QTableWidget
     for (auto it = productCatalog.begin(); it != productCatalog.end(); ++it) {
@@ -34,6 +36,10 @@ void MainWindow::initializeProductCatalog() {
         ui->tableCatalog->setItem(row, 1, new QTableWidgetItem(it.value().name));
         ui->tableCatalog->setItem(row, 2, new QTableWidgetItem(QString("₹ %1").arg(it.value().price, 0, 'f', 2)));
     }
+
+    ui->tableCatalog->verticalHeader()->setVisible(false);
+    ui->tableCatalog->setShowGrid(false);
+
 }
 
 void MainWindow::on_buttonAddToCart_clicked()
@@ -65,13 +71,16 @@ void MainWindow::updateCartDisplay()
 
         int row = ui->tableCart->rowCount();
         ui->tableCart->insertRow(row);
-        ui->tableCart->setItem(row, 0, new QTableWidgetItem(QString::number(code)));
-        ui->tableCart->setItem(row, 1, new QTableWidgetItem(product.name));
-        ui->tableCart->setItem(row, 2, new QTableWidgetItem(QString::number(qty)));
-        ui->tableCart->setItem(row, 3, new QTableWidgetItem(QString("₹ %1").arg(product.price, 0, 'f', 2)));
+        ui->tableCart->setItem(row, 0, new QTableWidgetItem(product.name));
+        ui->tableCart->setItem(row, 1, new QTableWidgetItem(QString::number(qty)));
+        ui->tableCart->setItem(row, 2 ,new QTableWidgetItem(QString("₹ %1").arg(product.price, 0, 'f', 2)));
         double total = product.price * qty;
-        ui->tableCart->setItem(row, 4, new QTableWidgetItem(QString("₹ %1").arg(total, 0, 'f', 2)));
+        ui->tableCart->setItem(row, 3, new QTableWidgetItem(QString("₹ %1").arg(total, 0, 'f', 2)));
     }
+
+    ui->tableCart->verticalHeader()->setVisible(false);
+    ui->tableCart->setShowGrid(false);
+
 }
 
 void MainWindow::updateTotals()
@@ -93,4 +102,12 @@ void MainWindow::updateTotals()
 }
 
 
+
+
+void MainWindow::on_buttonClearCart_clicked()
+{
+    cart.clear();                         // Clear the cart data
+    ui->tableCart->setRowCount(0);        // Clear the table
+    updateTotals();
+}
 
