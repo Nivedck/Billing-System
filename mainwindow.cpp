@@ -38,6 +38,8 @@ void MainWindow::connectToDatabase() {
                "price REAL NOT NULL)");
 }
 
+
+
 void MainWindow::loadProductsFromDatabase()
 {
     QSqlQuery query("SELECT code, name, price FROM products");
