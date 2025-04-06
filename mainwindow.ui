@@ -17,7 +17,7 @@
    <string notr="true">background-color:rgb(71, 71, 71)</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QTableWidget" name="productTable">
+   <widget class="QTableWidget" name="tableCatalog">
     <property name="geometry">
      <rect>
       <x>90</x>
@@ -57,7 +57,7 @@ font-color:rgb(0, 0, 0)</string>
      </property>
     </column>
    </widget>
-   <widget class="QTableWidget" name="cartTable">
+   <widget class="QTableWidget" name="tableCart">
     <property name="geometry">
      <rect>
       <x>700</x>
@@ -96,7 +96,7 @@ background-color:rgb(110, 110, 110);
      </property>
     </column>
    </widget>
-   <widget class="QLineEdit" name="lineProductCode">
+   <widget class="QLineEdit" name="lineEditCode">
     <property name="geometry">
      <rect>
       <x>260</x>
@@ -106,7 +106,7 @@ background-color:rgb(110, 110, 110);
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineQuantity_2">
+   <widget class="QLineEdit" name="lineEditQuantity">
     <property name="geometry">
      <rect>
       <x>260</x>
@@ -220,7 +220,7 @@ background-color:rgb(110, 110, 110);
      <string>Clear Cart</string>
     </property>
    </widget>
-   <widget class="QLabel" name="labelProductCatalogue">
+   <widget class="QLabel" name="labelProductCatalog">
     <property name="geometry">
      <rect>
       <x>90</x>
