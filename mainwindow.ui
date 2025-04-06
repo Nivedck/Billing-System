@@ -6,12 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1316</width>
-    <height>756</height>
+    <width>1321</width>
+    <height>724</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color:rgb(71, 71, 71)</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTableWidget" name="productTable">
@@ -20,9 +23,19 @@
       <x>90</x>
       <y>70</y>
       <width>501</width>
-      <height>451</height>
+      <height>361</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+font: 12pt &quot;Fira Sans&quot;;
+background-color:rgb(110, 110, 110);
+gridline-color: rgb(0, 0, 0);
+font-color:rgb(0, 0, 0)</string>
+    </property>
+    <attribute name="horizontalHeaderStretchLastSection">
+     <bool>true</bool>
+    </attribute>
     <column>
      <property name="text">
       <string>Code</string>
@@ -49,10 +62,19 @@
      <rect>
       <x>700</x>
       <y>70</y>
-      <width>501</width>
-      <height>451</height>
+      <width>481</width>
+      <height>361</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+
+background-color:rgb(110, 110, 110);
+</string>
+    </property>
+    <attribute name="horizontalHeaderStretchLastSection">
+     <bool>true</bool>
+    </attribute>
     <column>
      <property name="text">
       <string>Item</string>
@@ -74,14 +96,174 @@
      </property>
     </column>
    </widget>
+   <widget class="QLineEdit" name="lineProductCode">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>490</y>
+      <width>113</width>
+      <height>32</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineQuantity_2">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>540</y>
+      <width>113</width>
+      <height>32</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelSubtotal">
+    <property name="geometry">
+     <rect>
+      <x>1022</x>
+      <y>460</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Subtotal: ₹0.00</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelTax">
+    <property name="geometry">
+     <rect>
+      <x>1022</x>
+      <y>490</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Tax (5%): ₹0.00</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelTotal">
+    <property name="geometry">
+     <rect>
+      <x>1022</x>
+      <y>520</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Total: ₹0.00</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelProductCode">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>490</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Product Code</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelQuantity">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>540</y>
+      <width>73</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Quantity</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="buttonAddToCart">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>620</y>
+      <width>101</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Add to Cart</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="buttonCheckout">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>620</y>
+      <width>101</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Checkout</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="buttonClearCart">
+    <property name="geometry">
+     <rect>
+      <x>770</x>
+      <y>620</y>
+      <width>101</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Clear Cart</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelProductCatalogue">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>40</y>
+      <width>191</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Product Catalogue&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelCart">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>40</y>
+      <width>191</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cart&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1316</width>
-     <height>26</height>
+     <width>1321</width>
+     <height>30</height>
     </rect>
    </property>
   </widget>
