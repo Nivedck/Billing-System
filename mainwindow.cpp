@@ -65,12 +65,11 @@ void MainWindow::updateCartDisplay()
 
         int row = ui->tableCart->rowCount();
         ui->tableCart->insertRow(row);
-        ui->tableCart->setItem(row, 0, new QTableWidgetItem(QString::number(code)));
-        ui->tableCart->setItem(row, 1, new QTableWidgetItem(product.name));
-        ui->tableCart->setItem(row, 2, new QTableWidgetItem(QString::number(qty)));
-        ui->tableCart->setItem(row, 3, new QTableWidgetItem(QString("₹ %1").arg(product.price, 0, 'f', 2)));
+        ui->tableCart->setItem(row, 0, new QTableWidgetItem(product.name));
+        ui->tableCart->setItem(row, 1, new QTableWidgetItem(QString::number(qty)));
+        ui->tableCart->setItem(row, 2 ,new QTableWidgetItem(QString("₹ %1").arg(product.price, 0, 'f', 2)));
         double total = product.price * qty;
-        ui->tableCart->setItem(row, 4, new QTableWidgetItem(QString("₹ %1").arg(total, 0, 'f', 2)));
+        ui->tableCart->setItem(row, 3, new QTableWidgetItem(QString("₹ %1").arg(total, 0, 'f', 2)));
     }
 }
 
