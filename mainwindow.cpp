@@ -5,6 +5,8 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
+#include <QInputDialog>
+#include <QMessageBox>
 
 
 
@@ -136,15 +138,20 @@ void MainWindow::on_buttonClearCart_clicked()
 }
 
 
-
 void MainWindow::on_buttonAdmin_clicked()
 {
-
-    AdminWindow admin;
-    admin.exec();  // This blocks until admin window is closed
-    on_buttonRefreshCatalog_clicked();  // 🔁 Auto-refresh after admin closes  // Shows admin window as a modal dialog
+    bool ok;
+    QString password = QInputDialog::getText(this, "Admin Login",
+                                             "Enter admin password:",
+                                             QLineEdit::Password,
+                                             "", &ok);
+    if (ok && password == "admin123") {
+        AdminWindow *admin = new AdminWindow(this);
+        admin->exec();  // Show as modal dialog
+    } else if (ok) {
+        QMessageBox::warning(this, "Access Denied", "Incorrect password.");
+    }
 }
-
 
 
 void MainWindow::on_buttonRefreshCatalog_clicked()
