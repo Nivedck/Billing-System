@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QMap>
 #include <QTableWidgetItem>
+#include "adminwindow.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -37,6 +39,8 @@ private:
     void updateTotals();
     void connectToDatabase();
     void loadProductsFromDatabase();
+    AdminWindow *adminWindow;  // Pointer to the admin window
+
 
 };
 #endif // MAINWINDOW_H
