@@ -31,6 +31,8 @@ private slots:
     void on_buttonAddToCart_clicked();
     void on_buttonClearCart_clicked();
 
+    void on_buttonAdmin_clicked();
+
 private:
     Ui::MainWindow *ui;
     QMap<int, Product> productCatalog;  // Key = Product Code

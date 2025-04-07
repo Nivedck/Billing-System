@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "adminwindow.h" // include header
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
@@ -133,4 +134,13 @@ void MainWindow::on_buttonClearCart_clicked()
     ui->tableCart->setRowCount(0);        // Clear the table
     updateTotals();
 }
+
+
+
+void MainWindow::on_buttonAdmin_clicked()
+{
+    AdminWindow adminWin;
+    adminWin.exec();  // Shows admin window as a modal dialog
+}
+
 

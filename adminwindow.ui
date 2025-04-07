@@ -1,85 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-    <class>AdminWindow</class>
-    <widget class="QWidget" name="AdminWindow">
-        <property name="windowTitle">
-            <string>Admin Window</string>
+ <class>AdminWindow</class>
+ <widget class="QWidget" name="AdminWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1302</width>
+    <height>752</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Admin Window</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupBoxAdd">
+     <property name="title">
+      <string>Add Product</string>
+     </property>
+     <layout class="QFormLayout" name="formLayoutAdd">
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelCode">
+        <property name="styleSheet">
+         <string notr="true">font-color:rgb(0, 0, 0)</string>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-            <item>
-                <widget class="QGroupBox" name="groupBoxAdd">
-                    <property name="title">
-                        <string>Add Product</string>
-                    </property>
-                    <layout class="QFormLayout" name="formLayoutAdd">
-                        <item row="0" column="0">
-                            <widget class="QLabel" name="labelCode">
-                                <property name="text">
-                                    <string>Code:</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="0" column="1">
-                            <widget class="QLineEdit" name="lineEditCode"/>
-                        </item>
-                        <item row="1" column="0">
-                            <widget class="QLabel" name="labelName">
-                                <property name="text">
-                                    <string>Name:</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="1">
-                            <widget class="QLineEdit" name="lineEditName"/>
-                        </item>
-                        <item row="2" column="0">
-                            <widget class="QLabel" name="labelPrice">
-                                <property name="text">
-                                    <string>Price:</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="2" column="1">
-                            <widget class="QLineEdit" name="lineEditPrice"/>
-                        </item>
-                        <item row="3" column="0" colspan="2">
-                            <widget class="QPushButton" name="buttonAddProduct">
-                                <property name="text">
-                                    <string>Add Product</string>
-                                </property>
-                            </widget>
-                        </item>
-                    </layout>
-                </widget>
-            </item>
-            <item>
-                <widget class="QGroupBox" name="groupBoxDelete">
-                    <property name="title">
-                        <string>Delete Product</string>
-                    </property>
-                    <layout class="QFormLayout" name="formLayoutDelete">
-                        <item row="0" column="0">
-                            <widget class="QLabel" name="labelDeleteCode">
-                                <property name="text">
-                                    <string>Code:</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="0" column="1">
-                            <widget class="QLineEdit" name="lineEditDeleteCode"/>
-                        </item>
-                        <item row="1" column="0" colspan="2">
-                            <widget class="QPushButton" name="buttonDeleteProduct">
-                                <property name="text">
-                                    <string>Delete Product</string>
-                                </property>
-                            </widget>
-                        </item>
-                    </layout>
-                </widget>
-            </item>
-        </layout>
+        <property name="text">
+         <string>Code:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="lineEditCode"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labelName">
+        <property name="text">
+         <string>Name:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="lineEditName"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="labelPrice">
+        <property name="text">
+         <string>Price:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="lineEditPrice"/>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QPushButton" name="buttonAddProduct">
+        <property name="text">
+         <string>Add Product</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
-    <resources/>
-    <connections/>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBoxDelete">
+     <property name="styleSheet">
+      <string notr="true">font-color:rgb(0, 0, 0)</string>
+     </property>
+     <property name="title">
+      <string>Delete Product</string>
+     </property>
+     <layout class="QFormLayout" name="formLayoutDelete">
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelDeleteCode">
+        <property name="text">
+         <string>Code:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="lineEditDeleteCode"/>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QPushButton" name="buttonDeleteProduct">
+        <property name="text">
+         <string>Delete Product</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
 </ui>

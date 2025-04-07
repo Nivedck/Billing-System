@@ -256,6 +256,19 @@ background-color:rgb(110, 110, 110);
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cart&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="buttonAdmin">
+    <property name="geometry">
+     <rect>
+      <x>1190</x>
+      <y>10</y>
+      <width>105</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Admin Panel</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
