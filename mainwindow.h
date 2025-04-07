@@ -30,8 +30,8 @@ public:
 private slots:
     void on_buttonAddToCart_clicked();
     void on_buttonClearCart_clicked();
-
     void on_buttonAdmin_clicked();
+    void on_buttonRefreshCatalog_clicked();
 
 private:
     Ui::MainWindow *ui;

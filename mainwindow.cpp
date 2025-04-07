@@ -139,8 +139,18 @@ void MainWindow::on_buttonClearCart_clicked()
 
 void MainWindow::on_buttonAdmin_clicked()
 {
-    AdminWindow adminWin;
-    adminWin.exec();  // Shows admin window as a modal dialog
+
+    AdminWindow admin;
+    admin.exec();  // This blocks until admin window is closed
+    on_buttonRefreshCatalog_clicked();  // 🔁 Auto-refresh after admin closes  // Shows admin window as a modal dialog
 }
 
+
+
+void MainWindow::on_buttonRefreshCatalog_clicked()
+{
+    ui->tableCatalog->setRowCount(0); // Clear existing rows
+    productCatalog.clear();           // Clear current catalog
+    loadProductsFromDatabase();       // Reload from DB
+}
 

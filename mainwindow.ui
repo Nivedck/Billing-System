@@ -269,6 +269,19 @@ background-color:rgb(110, 110, 110);
      <string>Admin Panel</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="buttonRefreshCatalog">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>430</y>
+      <width>105</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Refresh</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
