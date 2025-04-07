@@ -147,7 +147,8 @@ void MainWindow::on_buttonAdmin_clicked()
                                              "", &ok);
     if (ok && password == "admin123") {
         AdminWindow *admin = new AdminWindow(this);
-        admin->exec();  // Show as modal dialog
+        admin->exec();
+        loadProductsFromDatabase();       // Show as modal dialog
     } else if (ok) {
         QMessageBox::warning(this, "Access Denied", "Incorrect password.");
     }
