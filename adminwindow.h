@@ -1,15 +1,22 @@
 #ifndef ADMINWINDOW_H
 #define ADMINWINDOW_H
 
-#include <QWidget>
+#include <QDialog>
 
-class AdminWindow : public QWidget
+namespace Ui {
+class AdminWindow;
+}
+
+class AdminWindow : public QDialog
 {
     Q_OBJECT
+
 public:
     explicit AdminWindow(QWidget *parent = nullptr);
+    ~AdminWindow();
 
-signals:
+private:
+    Ui::AdminWindow *ui;  // ✅ This line is required!
 };
 
 #endif // ADMINWINDOW_H
