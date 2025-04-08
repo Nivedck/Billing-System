@@ -16,12 +16,14 @@ public:
     ~AdminWindow();
 
 private slots:
-    void on_buttonAddProduct_clicked();
-    void on_buttonDeleteProduct_clicked();
+    void on_buttonDelete_clicked();
+    void on_buttonUpdate_clicked();
+    void on_buttonAdd_clicked();
 
 
 private:
-    Ui::AdminWindow *ui;  // ✅ This line is required!
+    Ui::AdminWindow *ui;
+    void loadProducts();    // ✅ This line is required!
 };
 
 #endif // ADMINWINDOW_H
