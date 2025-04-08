@@ -17,6 +17,14 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     connectToDatabase();
     loadProductsFromDatabase();
+    setupAutoComplete();
+    onProductNameEntered();
+
+
+    connect(ui->lineEditProductName, &QLineEdit::returnPressed, this, &MainWindow::onProductNameEntered);
+
+
+
 
 }
 
@@ -40,6 +48,64 @@ void MainWindow::connectToDatabase() {
                "name TEXT NOT NULL, "
                "price REAL NOT NULL)");
 }
+
+void MainWindow::onProductNameEntered()
+{
+    QString name = ui->lineEditProductName->text();
+
+    QSqlQuery query;
+    query.prepare("SELECT code, price FROM products WHERE name = ?");
+    query.addBindValue(name);
+
+    if (query.exec() && query.next()) {
+        int code = query.value(0).toInt();
+        double price = query.value(1).toDouble();
+
+        // Call your existing function to add item to cart using code
+        addProductToCart(code, name, price);
+    } else {
+        QMessageBox::warning(this, "Not Found", "Product not found.");
+    }
+
+    ui->lineEditProductName->clear();
+}
+
+void MainWindow::addProductToCart(int code, const QString &name, double price)
+{
+    int qty = 1; // Default quantity as 1 when added via name search
+
+    // If already in cart, increase qty
+    cart[code] += qty;
+
+    // Ensure the product is in the catalog map
+    if (!productCatalog.contains(code)) {
+        productCatalog[code] = {name, price};
+    }
+
+    updateCartDisplay();
+    updateTotals();
+}
+
+
+
+void MainWindow::setupAutoComplete()
+{
+    model = new QStringListModel(this);
+    completer = new QCompleter(this);
+    completer->setModel(model);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setFilterMode(Qt::MatchContains);
+    ui->lineEditProductName->setCompleter(completer);
+
+    // Fetch product names from DB
+    QStringList names;
+    QSqlQuery query("SELECT name FROM products");
+    while (query.next()) {
+        names << query.value(0).toString();
+    }
+    model->setStringList(names);
+}
+
 
 
 
@@ -70,7 +136,7 @@ void MainWindow::loadProductsFromDatabase()
 
 void MainWindow::on_buttonAddToCart_clicked()
 {
-    int code = ui->lineEditCode->text().toInt();
+    int code = ui->lineEditProductName->text().toInt();
     int qty = ui->lineEditQuantity->text().toInt();
 
     // Optional: You can add basic input validation here if needed
@@ -80,11 +146,11 @@ void MainWindow::on_buttonAddToCart_clicked()
     updateTotals();
 
     // 🔽 Clear inputs
-    ui->lineEditCode->clear();
+    ui->lineEditProductName->clear();
     ui->lineEditQuantity->clear();
 
     // Optional: Set focus back to code input for quicker entry
-    ui->lineEditCode->setFocus();
+    ui->lineEditProductName->setFocus();
 }
 
 void MainWindow::updateCartDisplay()

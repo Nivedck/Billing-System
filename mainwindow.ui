@@ -43,11 +43,6 @@ font-color:rgb(0, 0, 0)</string>
     </column>
     <column>
      <property name="text">
-      <string/>
-     </property>
-    </column>
-    <column>
-     <property name="text">
       <string>Name</string>
      </property>
     </column>
@@ -96,7 +91,7 @@ background-color:rgb(110, 110, 110);
      </property>
     </column>
    </widget>
-   <widget class="QLineEdit" name="lineEditCode">
+   <widget class="QLineEdit" name="lineEditProductName">
     <property name="geometry">
      <rect>
       <x>260</x>
@@ -165,7 +160,7 @@ background-color:rgb(110, 110, 110);
      </rect>
     </property>
     <property name="text">
-     <string>Product Code</string>
+     <string>Product Name</string>
     </property>
    </widget>
    <widget class="QLabel" name="labelQuantity">

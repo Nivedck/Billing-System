@@ -5,6 +5,8 @@
 #include <QMap>
 #include <QTableWidgetItem>
 #include "adminwindow.h"
+#include <QCompleter>
+#include <QStringListModel>
 
 
 QT_BEGIN_NAMESPACE
@@ -32,6 +34,7 @@ private slots:
     void on_buttonClearCart_clicked();
     void on_buttonAdmin_clicked();
     void on_buttonRefreshCatalog_clicked();
+    void onProductNameEntered();
 
 private:
     Ui::MainWindow *ui;
@@ -42,6 +45,11 @@ private:
     void connectToDatabase();
     void loadProductsFromDatabase();
     AdminWindow *adminWindow;  // Pointer to the admin window
+    QCompleter *completer;
+    QStringListModel *model;
+    void setupAutoComplete();
+    void addProductToCart(int code, const QString &name, double price);
+
 
 
 };
