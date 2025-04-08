@@ -294,17 +294,21 @@ void MainWindow::tryAddToCart()
 
 void MainWindow::showBillInMessageBox()
 {
-    QString bill = "========== Supermarket Bill ==========\n";
-    double subtotal = 0.0;
+    QString bill;
+    bill += "========== Supermarket Bill ==========\n";
+    bill += QString("Date: %1\n\n").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
+    bill += "Item\tQty\tPrice\tTotal\n";
+    bill += "--------------------------------------\n";
 
+    double subtotal = 0.0;
     for (auto it = cart.begin(); it != cart.end(); ++it) {
         int code = it.key();
         int qty = it.value();
-        const Product& product = productCatalog[code];
+        const Product &product = productCatalog[code];
         double total = product.price * qty;
         subtotal += total;
 
-        bill += QString("%1\n  Qty: %2  Price: ₹%3  Total: ₹%4\n")
+        bill += QString("%1\t%2\t₹%3\t₹%4\n")
                     .arg(product.name)
                     .arg(qty)
                     .arg(product.price, 0, 'f', 2)
@@ -315,12 +319,24 @@ void MainWindow::showBillInMessageBox()
     double grandTotal = subtotal + tax;
 
     bill += "--------------------------------------\n";
-    bill += QString("Subtotal: ₹%1\n").arg(subtotal, 0, 'f', 2);
-    bill += QString("Tax (5%%): ₹%1\n").arg(tax, 0, 'f', 2);
-    bill += QString("Total: ₹%1\n").arg(grandTotal, 0, 'f', 2);
-    bill += "======================================";
+    bill += QString("Subtotal:\t\t\t₹%1\n").arg(subtotal, 0, 'f', 2);
+    bill += QString("Tax (5%%):\t\t\t₹%1\n").arg(tax, 0, 'f', 2);
+    bill += QString("Total:\t\t\t₹%1\n").arg(grandTotal, 0, 'f', 2);
+    bill += "======================================\n";
+    bill += "      Thank you for shopping with us!\n";
 
-    QMessageBox::information(this, "Bill", bill);
+    // 🧱 Create a custom message box with fixed size
+    QMessageBox *msgBox = new QMessageBox(this);
+    msgBox->setWindowTitle("Bill");
+    msgBox->setTextFormat(Qt::PlainText); // Makes sure it's not rich text
+    msgBox->setText(bill);
+    msgBox->setStandardButtons(QMessageBox::Ok);
+
+    // ✅ Make the size bigger and fixed
+    msgBox->setMinimumSize(600, 400);
+    msgBox->setStyleSheet("QLabel{min-width: 580px; min-height: 360px;}");
+
+    msgBox->exec();
 }
 
 
