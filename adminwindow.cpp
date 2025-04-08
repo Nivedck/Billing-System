@@ -6,10 +6,14 @@
 
 AdminWindow::AdminWindow(QWidget *parent)
     : QDialog(parent)
-    , ui(new Ui::AdminWindow)  // ✅ Correct initializer
+    , ui(new Ui::AdminWindow)
 {
     ui->setupUi(this);
-    this->setFixedSize(400, 300);  // optional: fix size
+    this->setFixedSize(600, 400);
+    ui->tableWidget->setColumnCount(3);
+    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Code" << "Name" << "Price");
+
+    loadProducts();    // Optional size adjustment
 }
 
 AdminWindow::~AdminWindow()
@@ -17,10 +21,24 @@ AdminWindow::~AdminWindow()
     delete ui;
 }
 
-#include <QSqlQuery>
-#include <QMessageBox>
+void AdminWindow::loadProducts()
+{
+    ui->tableWidget->setRowCount(0);  // Clear existing rows
 
-void AdminWindow::on_buttonAddProduct_clicked()
+    QSqlQuery query("SELECT code, name, price FROM products");
+
+    int row = 0;
+    while (query.next()) {
+        ui->tableWidget->insertRow(row);
+        ui->tableWidget->setItem(row, 0, new QTableWidgetItem(query.value(0).toString()));
+        ui->tableWidget->setItem(row, 1, new QTableWidgetItem(query.value(1).toString()));
+        ui->tableWidget->setItem(row, 2, new QTableWidgetItem(query.value(2).toString()));
+        row++;
+    }
+}
+
+
+void AdminWindow::on_buttonAdd_clicked()
 {
     int code = ui->lineEditCode->text().toInt();
     QString name = ui->lineEditName->text();
@@ -35,17 +53,42 @@ void AdminWindow::on_buttonAddProduct_clicked()
     if (!query.exec()) {
         QMessageBox::warning(this, "Error", "Failed to add product.");
     } else {
-        QMessageBox::information(this, "Success", "Product added successfully.");
+        QMessageBox::information(this, "Success", "Product added.");
+        loadProducts();  // 🔥 Add this line
     }
+
 
     ui->lineEditCode->clear();
     ui->lineEditName->clear();
     ui->lineEditPrice->clear();
 }
 
-void AdminWindow::on_buttonDeleteProduct_clicked()
+void AdminWindow::on_buttonUpdate_clicked()
 {
-    int code = ui->lineEditDeleteCode->text().toInt();
+    int code = ui->lineEditCode->text().toInt();
+    QString name = ui->lineEditName->text();
+    double price = ui->lineEditPrice->text().toDouble();
+
+    QSqlQuery query;
+    query.prepare("UPDATE products SET name = ?, price = ? WHERE code = ?");
+    query.addBindValue(name);
+    query.addBindValue(price);
+    query.addBindValue(code);
+
+    if (!query.exec()) {
+        QMessageBox::warning(this, "Error", "Failed to update product.");
+    } else if (query.numRowsAffected() == 0) {
+        QMessageBox::information(this, "Not Found", "Product not found.");
+    } else {
+        QMessageBox::information(this, "Success", "Product updated.");
+        loadProducts();  // 🔥 Add this
+    }
+
+}
+
+void AdminWindow::on_buttonDelete_clicked()
+{
+    int code = ui->lineEditCode->text().toInt();
 
     QSqlQuery query;
     query.prepare("DELETE FROM products WHERE code = ?");
@@ -56,9 +99,12 @@ void AdminWindow::on_buttonDeleteProduct_clicked()
     } else if (query.numRowsAffected() == 0) {
         QMessageBox::information(this, "Not Found", "No product with that code.");
     } else {
-        QMessageBox::information(this, "Deleted", "Product deleted successfully.");
+        QMessageBox::information(this, "Deleted", "Product deleted.");
+        loadProducts();  // 🔥 Add this
     }
 
-    ui->lineEditDeleteCode->clear();
-}
 
+    ui->lineEditCode->clear();
+    ui->lineEditName->clear();
+    ui->lineEditPrice->clear();
+}
