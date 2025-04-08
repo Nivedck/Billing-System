@@ -20,8 +20,8 @@ MainWindow::MainWindow(QWidget *parent)
     setupAutoComplete();
     onProductNameEntered();
 
-
     connect(ui->lineEditProductName, &QLineEdit::returnPressed, this, &MainWindow::onProductNameEntered);
+    connect(ui->lineEditQuantity, &QLineEdit::returnPressed, this, &MainWindow::on_buttonAddToCart_clicked);
 
 
 
