@@ -35,6 +35,7 @@ private slots:
     void on_buttonAdmin_clicked();
     void on_buttonRefreshCatalog_clicked();
     void onProductNameEntered();
+    void tryAddToCart();
 
 private:
     Ui::MainWindow *ui;

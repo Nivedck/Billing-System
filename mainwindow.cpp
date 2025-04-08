@@ -19,13 +19,10 @@ MainWindow::MainWindow(QWidget *parent)
     loadProductsFromDatabase();
     setupAutoComplete();
 
-    connect(ui->lineEditProductName, &QLineEdit::returnPressed, this, &MainWindow::onProductNameEntered);
-    connect(ui->lineEditQuantity, &QLineEdit::returnPressed, this, &MainWindow::on_buttonAddToCart_clicked);
-
-
-
-
+    connect(ui->lineEditProductName, &QLineEdit::returnPressed, this, &MainWindow::tryAddToCart);
+    connect(ui->lineEditQuantity, &QLineEdit::returnPressed, this, &MainWindow::tryAddToCart);
 }
+
 
 MainWindow::~MainWindow()
 {
@@ -48,26 +45,8 @@ void MainWindow::connectToDatabase() {
                "price REAL NOT NULL)");
 }
 
-void MainWindow::onProductNameEntered()
-{
-    QString name = ui->lineEditProductName->text();
+void MainWindow::onProductNameEntered() {}
 
-    QSqlQuery query;
-    query.prepare("SELECT code, price FROM products WHERE name = ?");
-    query.addBindValue(name);
-
-    if (query.exec() && query.next()) {
-        int code = query.value(0).toInt();
-        double price = query.value(1).toDouble();
-
-        // Call your existing function to add item to cart using code
-        addProductToCart(code, name, price);
-    } else {
-        QMessageBox::warning(this, "Not Found", "Product not found.");
-    }
-
-    ui->lineEditProductName->clear();
-}
 
 void MainWindow::addProductToCart(int code, const QString &name, double price)
 {
@@ -135,22 +114,9 @@ void MainWindow::loadProductsFromDatabase()
 
 void MainWindow::on_buttonAddToCart_clicked()
 {
-    int code = ui->lineEditProductName->text().toInt();
-    int qty = ui->lineEditQuantity->text().toInt();
-
-    // Optional: You can add basic input validation here if needed
-
-    cart[code] += qty;
-    updateCartDisplay();
-    updateTotals();
-
-    // 🔽 Clear inputs
-    ui->lineEditProductName->clear();
-    ui->lineEditQuantity->clear();
-
-    // Optional: Set focus back to code input for quicker entry
-    ui->lineEditProductName->setFocus();
+    tryAddToCart();
 }
+
 
 void MainWindow::updateCartDisplay()
 {
@@ -225,5 +191,58 @@ void MainWindow::on_buttonRefreshCatalog_clicked()
     ui->tableCatalog->setRowCount(0); // Clear existing rows
     productCatalog.clear();           // Clear current catalog
     loadProductsFromDatabase();       // Reload from DB
+}
+
+
+void MainWindow::tryAddToCart()
+{
+    QString input = ui->lineEditProductName->text().trimmed();
+    QString qtyStr = ui->lineEditQuantity->text().trimmed();
+    int qty = qtyStr.toInt();
+    if (qty <= 0) qty = 1;
+
+    if (input.isEmpty()) {
+        QMessageBox::warning(this, "Input Error", "Please enter a product code or name.");
+        return;
+    }
+
+    bool ok;
+    int code = input.toInt(&ok);
+
+    if (ok) {
+        // Input is a product code
+        if (productCatalog.contains(code)) {
+            cart[code] += qty;
+            updateCartDisplay();
+            updateTotals();
+        } else {
+            QMessageBox::warning(this, "Not Found", "Product code not found.");
+        }
+    } else {
+        // Input is a product name
+        QSqlQuery query;
+        query.prepare("SELECT code, price FROM products WHERE name = ?");
+        query.addBindValue(input);
+
+        if (query.exec() && query.next()) {
+            int code = query.value(0).toInt();
+            double price = query.value(1).toDouble();
+
+            cart[code] += qty;
+
+            if (!productCatalog.contains(code)) {
+                productCatalog[code] = {input, price};
+            }
+
+            updateCartDisplay();
+            updateTotals();
+        } else {
+            QMessageBox::warning(this, "Not Found", "Product name not found.");
+        }
+    }
+
+    ui->lineEditProductName->clear();
+    ui->lineEditQuantity->clear();
+    ui->lineEditProductName->setFocus();
 }
 
