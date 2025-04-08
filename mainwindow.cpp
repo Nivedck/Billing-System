@@ -7,6 +7,8 @@
 #include <QDebug>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QDateTime> // ✅ Required for QDateTime
+
 
 
 
@@ -21,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->lineEditProductName, &QLineEdit::returnPressed, this, &MainWindow::tryAddToCart);
     connect(ui->lineEditQuantity, &QLineEdit::returnPressed, this, &MainWindow::tryAddToCart);
+    connect(ui->buttonCheckout, &QPushButton::clicked, this, &MainWindow::on_buttonCheckout_clicked);
+
 }
 
 
@@ -115,6 +119,44 @@ void MainWindow::loadProductsFromDatabase()
 void MainWindow::on_buttonAddToCart_clicked()
 {
     tryAddToCart();
+}
+
+
+void MainWindow::on_buttonCheckout_clicked()
+{
+    if (cart.isEmpty()) {
+        QMessageBox::information(this, "Checkout", "Cart is empty.");
+        return;
+    }
+
+    QSqlQuery query;
+    QString date = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+
+    for (auto it = cart.begin(); it != cart.end(); ++it) {
+        int code = it.key();
+        int qty = it.value();
+        const Product& product = productCatalog[code];
+        double total = product.price * qty;
+
+        query.prepare("INSERT INTO sales (date, product_name, quantity, price, total) "
+                      "VALUES (?, ?, ?, ?, ?)");
+        query.addBindValue(date);
+        query.addBindValue(product.name);
+        query.addBindValue(qty);
+        query.addBindValue(product.price);
+        query.addBindValue(total);
+
+        if (!query.exec()) {
+            qDebug() << "Insert failed:" << query.lastError().text();
+        }
+    }
+
+    QMessageBox::information(this, "Checkout", "Purchase completed and saved!");
+
+    // Clear cart and refresh UI
+    cart.clear();
+    updateCartDisplay();
+    updateTotals();
 }
 
 
