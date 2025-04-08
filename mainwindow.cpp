@@ -28,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 
+
+
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -151,9 +153,11 @@ void MainWindow::on_buttonCheckout_clicked()
         }
     }
 
+    // 👇 Show the bill popup before clearing the cart
+    showBillInMessageBox();
+
     QMessageBox::information(this, "Checkout", "Purchase completed and saved!");
 
-    // Clear cart and refresh UI
     cart.clear();
     updateCartDisplay();
     updateTotals();
@@ -287,4 +291,36 @@ void MainWindow::tryAddToCart()
     ui->lineEditQuantity->clear();
     ui->lineEditProductName->setFocus();
 }
+
+void MainWindow::showBillInMessageBox()
+{
+    QString bill = "========== Supermarket Bill ==========\n";
+    double subtotal = 0.0;
+
+    for (auto it = cart.begin(); it != cart.end(); ++it) {
+        int code = it.key();
+        int qty = it.value();
+        const Product& product = productCatalog[code];
+        double total = product.price * qty;
+        subtotal += total;
+
+        bill += QString("%1\n  Qty: %2  Price: ₹%3  Total: ₹%4\n")
+                    .arg(product.name)
+                    .arg(qty)
+                    .arg(product.price, 0, 'f', 2)
+                    .arg(total, 0, 'f', 2);
+    }
+
+    double tax = subtotal * 0.05;
+    double grandTotal = subtotal + tax;
+
+    bill += "--------------------------------------\n";
+    bill += QString("Subtotal: ₹%1\n").arg(subtotal, 0, 'f', 2);
+    bill += QString("Tax (5%%): ₹%1\n").arg(tax, 0, 'f', 2);
+    bill += QString("Total: ₹%1\n").arg(grandTotal, 0, 'f', 2);
+    bill += "======================================";
+
+    QMessageBox::information(this, "Bill", bill);
+}
+
 

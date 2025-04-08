@@ -37,6 +37,7 @@ private slots:
     void onProductNameEntered();
     void tryAddToCart();
     void on_buttonCheckout_clicked();
+    void showBillInMessageBox();
 
 private:
     Ui::MainWindow *ui;
