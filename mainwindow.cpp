@@ -292,6 +292,27 @@ void MainWindow::tryAddToCart()
     ui->lineEditProductName->setFocus();
 }
 
+void MainWindow::recalculateTotals() {
+    double subtotal = 0.0;
+
+    int rowCount = ui->tableCart->rowCount();
+
+    for (int row = 0; row < rowCount; ++row) {
+        QTableWidgetItem *totalItem = ui->tableCart->item(row, 3); // Assuming column 3 holds total price
+        if (totalItem) {
+            subtotal += totalItem->text().toDouble();
+        }
+    }
+
+    double tax = subtotal * 0.05;
+    double grandTotal = subtotal + tax;
+
+    ui->labelSubtotal->setText(QString::number(subtotal, 'f', 2));
+    ui->labelTax->setText(QString::number(tax, 'f', 2));
+    ui->labelTotal->setText(QString::number(grandTotal, 'f', 2));
+}
+
+
 void MainWindow::showBillInMessageBox()
 {
     QString bill;
@@ -339,4 +360,17 @@ void MainWindow::showBillInMessageBox()
     msgBox->exec();
 }
 
+
+
+void MainWindow::on_removeButton_clicked()
+{
+    int selectedRow = ui->tableCart->currentRow();
+
+    if (selectedRow >= 0) {
+        ui->tableCart->removeRow(selectedRow);
+        recalculateTotals(); // If you have a function to update totals
+    } else {
+        QMessageBox::warning(this, "No Selection", "Please select an item to remove.");
+    }
+}
 

@@ -277,6 +277,19 @@ background-color:rgb(110, 110, 110);
      <string>Refresh</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="removeButton">
+    <property name="geometry">
+     <rect>
+      <x>860</x>
+      <y>450</y>
+      <width>105</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Remove Item</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

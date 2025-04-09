@@ -38,6 +38,9 @@ private slots:
     void tryAddToCart();
     void on_buttonCheckout_clicked();
     void showBillInMessageBox();
+    void recalculateTotals();
+
+    void on_removeButton_clicked();
 
 private:
     Ui::MainWindow *ui;
