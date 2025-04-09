@@ -34,7 +34,7 @@ private slots:
     void on_buttonClearCart_clicked();
     void on_buttonAdmin_clicked();
     void on_buttonRefreshCatalog_clicked();
-    void onProductNameEntered();
+
     void tryAddToCart();
     void on_buttonCheckout_clicked();
     void showBillInMessageBox();
