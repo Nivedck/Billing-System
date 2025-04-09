@@ -361,16 +361,31 @@ void MainWindow::showBillInMessageBox()
 }
 
 
-
 void MainWindow::on_removeButton_clicked()
 {
     int selectedRow = ui->tableCart->currentRow();
 
     if (selectedRow >= 0) {
-        ui->tableCart->removeRow(selectedRow);
-        recalculateTotals(); // If you have a function to update totals
+        QString productName = ui->tableCart->item(selectedRow, 0)->text();
+
+        // Find the matching product code from the name
+        int codeToRemove = -1;
+        for (auto it = productCatalog.begin(); it != productCatalog.end(); ++it) {
+            if (it.value().name == productName) {
+                codeToRemove = it.key();
+                break;
+            }
+        }
+
+        if (codeToRemove != -1) {
+            cart.remove(codeToRemove); // Remove from the cart map
+        }
+
+        ui->tableCart->removeRow(selectedRow); // Remove from UI
+        updateTotals(); // Properly update totals using cart data
     } else {
         QMessageBox::warning(this, "No Selection", "Please select an item to remove.");
     }
 }
+
 
