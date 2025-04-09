@@ -1,13 +1,14 @@
 # 📟 Billing-System (Qt C++)
 
-A simple supermarket billing system with a GUI built using **Qt** and **C++**. This app allows a cashier to select products, calculate totals (including tax), and manage a cart-based billing flow.
+A simple supermarket billing system with a GUI built using **Qt** and **C++**. This app allows a cashier to select products, calculate totals (including tax), and manage a cart-based billing flow with real-time product search, an admin panel, and a database-driven catalog.
 
 ![Screenshot](screenshot.png)
 
 ## ✨ Features
 
-- Predefined product catalog (hardcoded, can be expanded later)
-- Add items to cart by entering product code and quantity
+- Product catalog loaded from **SQLite** database
+- Add items to cart by entering **product name** with auto-suggestions
+- **Admin Panel** to add and delete products from the database
 - Auto-calculates subtotal, tax (5%), and total
 - Displays itemized bill with price and quantity
 - Clean Qt-based user interface (QTableWidgets, QLabel, QPushButton, etc.)
@@ -18,6 +19,7 @@ A simple supermarket billing system with a GUI built using **Qt** and **C++**. T
 
 - **Language**: C++
 - **Framework**: Qt 6 / Qt 5 (QtWidgets)
+- **Database**: SQLite
 - **IDE**: Qt Creator
 
 ---
@@ -30,25 +32,34 @@ Billing-System/
 ├── mainwindow.cpp
 ├── mainwindow.h
 ├── mainwindow.ui
+├── adminwindow.cpp
+├── adminwindow.h
+├── adminwindow.ui
+├── products.db
 ├── Billing-System.pro
 └── README.md
 ```
 
----
-
 ## 🚀 Getting Started
-
-1. **Clone the Repository**
+Clone the Repository
 
 ```bash
+Copy
+Edit
 git clone https://github.com/Nivedck/Billing-System.git
 cd Billing-System
 ```
-
 2. **Open in Qt Creator**
 
-- Open `Billing-System.pro` in **Qt Creator**
-- Build and Run the project
+ - Open `Billing-System.pro` in **Qt Creator**
+
+ - Build and Run the project
+
+**Database**
+
+A sample products.db file is included
+
+Use the Admin Panel to manage the catalog
 
 ---
 
@@ -69,27 +80,24 @@ cd Billing-System
 
 ---
 
-## ✅ To Do
 
-- [x] Basic UI and logic
-- [ ] Remove item from cart
-- [ ] Save/print bill
-- [ ] Connect to database (SQLite)
-- [ ] Add barcode scanner support
+##✅ To Do
 
----
+ - Basic UI and logic   ✅
 
-## 📸 Screenshots
+ - Connect to database (SQLite)  ✅
 
-> You can add a full screenshot of the app UI here.
+ - Admin Panel to manage products ✅
 
----
+ - Product search with suggestions ✅
 
-## 📄 License
+ - Remove item from cart
 
+ - Save/print bill
+
+ - Add barcode scanner support
+
+
+📄 License
 MIT License
-
----
-
-Made with 💻 by [Nivedck](https://github.com/Nivedck)
 
