@@ -1,16 +1,15 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "adminwindow.h" // include header
+#include "adminwindow.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
 #include <QInputDialog>
 #include <QMessageBox>
-#include <QDateTime> // ✅ Required for QDateTime
-
-
-
+#include <QDateTime>
+#include <QStringListModel>
+#include <QCompleter>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -24,11 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->lineEditProductName, &QLineEdit::returnPressed, this, &MainWindow::tryAddToCart);
     connect(ui->lineEditQuantity, &QLineEdit::returnPressed, this, &MainWindow::tryAddToCart);
     connect(ui->buttonCheckout, &QPushButton::clicked, this, &MainWindow::on_buttonCheckout_clicked);
-
 }
-
-
-
 
 MainWindow::~MainWindow()
 {
@@ -51,48 +46,6 @@ void MainWindow::connectToDatabase() {
                "price REAL NOT NULL)");
 }
 
-void MainWindow::onProductNameEntered() {}
-
-
-void MainWindow::addProductToCart(int code, const QString &name, double price)
-{
-    int qty = 1; // Default quantity as 1 when added via name search
-
-    // If already in cart, increase qty
-    cart[code] += qty;
-
-    // Ensure the product is in the catalog map
-    if (!productCatalog.contains(code)) {
-        productCatalog[code] = {name, price};
-    }
-
-    updateCartDisplay();
-    updateTotals();
-}
-
-
-
-void MainWindow::setupAutoComplete()
-{
-    model = new QStringListModel(this);
-    completer = new QCompleter(this);
-    completer->setModel(model);
-    completer->setCaseSensitivity(Qt::CaseInsensitive);
-    completer->setFilterMode(Qt::MatchContains);
-    ui->lineEditProductName->setCompleter(completer);
-
-    // Fetch product names from DB
-    QStringList names;
-    QSqlQuery query("SELECT name FROM products");
-    while (query.next()) {
-        names << query.value(0).toString();
-    }
-    model->setStringList(names);
-}
-
-
-
-
 void MainWindow::loadProductsFromDatabase()
 {
     QSqlQuery query("SELECT code, name, price FROM products");
@@ -114,15 +67,135 @@ void MainWindow::loadProductsFromDatabase()
     ui->tableCatalog->setShowGrid(false);
 }
 
+void MainWindow::setupAutoComplete()
+{
+    model = new QStringListModel(this);
+    completer = new QCompleter(this);
+    completer->setModel(model);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setFilterMode(Qt::MatchContains);
+    ui->lineEditProductName->setCompleter(completer);
 
+    QStringList names;
+    QSqlQuery query("SELECT name FROM products");
+    while (query.next()) {
+        names << query.value(0).toString();
+    }
+    model->setStringList(names);
+}
 
+void MainWindow::addProductToCart(int code, const QString &name, double price)
+{
+    int qty = 1;
+    cart[code] += qty;
 
+    if (!productCatalog.contains(code)) {
+        productCatalog[code] = {name, price};
+    }
+
+    updateCartDisplay();
+    updateTotals();
+}
 
 void MainWindow::on_buttonAddToCart_clicked()
 {
     tryAddToCart();
 }
 
+void MainWindow::tryAddToCart()
+{
+    QString input = ui->lineEditProductName->text().trimmed();
+    QString qtyStr = ui->lineEditQuantity->text().trimmed();
+    int qty = qtyStr.toInt();
+    if (qty <= 0) qty = 1;
+
+    if (input.isEmpty()) {
+        QMessageBox::warning(this, "Input Error", "Please enter a product code or name.");
+        return;
+    }
+
+    bool ok;
+    int code = input.toInt(&ok);
+
+    if (ok) {
+        if (productCatalog.contains(code)) {
+            cart[code] += qty;
+            updateCartDisplay();
+            updateTotals();
+        } else {
+            QMessageBox::warning(this, "Not Found", "Product code not found.");
+        }
+    } else {
+        QSqlQuery query;
+        query.prepare("SELECT code, price FROM products WHERE name = ?");
+        query.addBindValue(input);
+
+        if (query.exec() && query.next()) {
+            int code = query.value(0).toInt();
+            double price = query.value(1).toDouble();
+            cart[code] += qty;
+
+            if (!productCatalog.contains(code)) {
+                productCatalog[code] = {input, price};
+            }
+
+            updateCartDisplay();
+            updateTotals();
+        } else {
+            QMessageBox::warning(this, "Not Found", "Product name not found.");
+        }
+    }
+
+    ui->lineEditProductName->clear();
+    ui->lineEditQuantity->clear();
+    ui->lineEditProductName->setFocus();
+}
+
+void MainWindow::updateCartDisplay()
+{
+    ui->tableCart->setRowCount(0);
+    for (auto it = cart.begin(); it != cart.end(); ++it) {
+        int code = it.key();
+        int qty = it.value();
+        const Product& product = productCatalog[code];
+
+        int row = ui->tableCart->rowCount();
+        ui->tableCart->insertRow(row);
+        ui->tableCart->setItem(row, 0, new QTableWidgetItem(product.name));
+        ui->tableCart->setItem(row, 1, new QTableWidgetItem(QString::number(qty)));
+        ui->tableCart->setItem(row, 2 ,new QTableWidgetItem(QString("₹ %1").arg(product.price, 0, 'f', 2)));
+        double total = product.price * qty;
+        ui->tableCart->setItem(row, 3, new QTableWidgetItem(QString("₹ %1").arg(total, 0, 'f', 2)));
+    }
+
+    ui->tableCart->verticalHeader()->setVisible(false);
+    ui->tableCart->setShowGrid(false);
+}
+
+void MainWindow::updateTotals()
+{
+    double subtotal = 0.0;
+
+    for (auto it = cart.begin(); it != cart.end(); ++it) {
+        int code = it.key();
+        int qty = it.value();
+        subtotal += productCatalog[code].price * qty;
+    }
+
+    double tax = subtotal * 0.05;
+    double total = subtotal + tax;
+
+    ui->labelSubtotal->setText(QString("Subtotal: ₹ %1").arg(subtotal, 0, 'f', 2));
+    ui->labelTax->setText(QString("Tax (5%): ₹ %1").arg(tax, 0, 'f', 2));
+    ui->labelTotal->setText(QString("Total: ₹ %1").arg(total, 0, 'f', 2));
+}
+
+void MainWindow::on_buttonClearCart_clicked()
+{
+    cart.clear();
+    ui->tableCart->setRowCount(0);
+    updateTotals();
+}
 
 void MainWindow::on_buttonCheckout_clicked()
 {
@@ -153,165 +226,12 @@ void MainWindow::on_buttonCheckout_clicked()
         }
     }
 
-    // 👇 Show the bill popup before clearing the cart
     showBillInMessageBox();
-
     QMessageBox::information(this, "Checkout", "Purchase completed and saved!");
-
     cart.clear();
     updateCartDisplay();
     updateTotals();
 }
-
-
-void MainWindow::updateCartDisplay()
-{
-    ui->tableCart->setRowCount(0);
-    for (auto it = cart.begin(); it != cart.end(); ++it) {
-        int code = it.key();
-        int qty = it.value();
-        const Product& product = productCatalog[code];
-
-        int row = ui->tableCart->rowCount();
-        ui->tableCart->insertRow(row);
-        ui->tableCart->setItem(row, 0, new QTableWidgetItem(product.name));
-        ui->tableCart->setItem(row, 1, new QTableWidgetItem(QString::number(qty)));
-        ui->tableCart->setItem(row, 2 ,new QTableWidgetItem(QString("₹ %1").arg(product.price, 0, 'f', 2)));
-        double total = product.price * qty;
-        ui->tableCart->setItem(row, 3, new QTableWidgetItem(QString("₹ %1").arg(total, 0, 'f', 2)));
-    }
-
-    ui->tableCart->verticalHeader()->setVisible(false);
-    ui->tableCart->setShowGrid(false);
-
-}
-
-void MainWindow::updateTotals()
-{
-    double subtotal = 0.0;
-
-    for (auto it = cart.begin(); it != cart.end(); ++it) {
-        int code = it.key();
-        int qty = it.value();
-        subtotal += productCatalog[code].price * qty;
-    }
-
-    double tax = subtotal * 0.05; // 5% tax
-    double total = subtotal + tax;
-
-    ui->labelSubtotal->setText(QString("Subtotal: ₹ %1").arg(subtotal, 0, 'f', 2));
-    ui->labelTax->setText(QString("Tax (5%): ₹ %1").arg(tax, 0, 'f', 2));
-    ui->labelTotal->setText(QString("Total: ₹ %1").arg(total, 0, 'f', 2));
-}
-
-
-
-
-void MainWindow::on_buttonClearCart_clicked()
-{
-    cart.clear();                         // Clear the cart data
-    ui->tableCart->setRowCount(0);        // Clear the table
-    updateTotals();
-}
-
-
-void MainWindow::on_buttonAdmin_clicked()
-{
-    bool ok;
-    QString password = QInputDialog::getText(this, "Admin Login",
-                                             "Enter admin password:",
-                                             QLineEdit::Password,
-                                             "", &ok);
-    if (ok && password == "admin123") {
-        AdminWindow *admin = new AdminWindow(this);
-        admin->exec();
-        loadProductsFromDatabase();       // Show as modal dialog
-    } else if (ok) {
-        QMessageBox::warning(this, "Access Denied", "Incorrect password.");
-    }
-}
-
-
-void MainWindow::on_buttonRefreshCatalog_clicked()
-{
-    ui->tableCatalog->setRowCount(0); // Clear existing rows
-    productCatalog.clear();           // Clear current catalog
-    loadProductsFromDatabase();       // Reload from DB
-}
-
-
-void MainWindow::tryAddToCart()
-{
-    QString input = ui->lineEditProductName->text().trimmed();
-    QString qtyStr = ui->lineEditQuantity->text().trimmed();
-    int qty = qtyStr.toInt();
-    if (qty <= 0) qty = 1;
-
-    if (input.isEmpty()) {
-        QMessageBox::warning(this, "Input Error", "Please enter a product code or name.");
-        return;
-    }
-
-    bool ok;
-    int code = input.toInt(&ok);
-
-    if (ok) {
-        // Input is a product code
-        if (productCatalog.contains(code)) {
-            cart[code] += qty;
-            updateCartDisplay();
-            updateTotals();
-        } else {
-            QMessageBox::warning(this, "Not Found", "Product code not found.");
-        }
-    } else {
-        // Input is a product name
-        QSqlQuery query;
-        query.prepare("SELECT code, price FROM products WHERE name = ?");
-        query.addBindValue(input);
-
-        if (query.exec() && query.next()) {
-            int code = query.value(0).toInt();
-            double price = query.value(1).toDouble();
-
-            cart[code] += qty;
-
-            if (!productCatalog.contains(code)) {
-                productCatalog[code] = {input, price};
-            }
-
-            updateCartDisplay();
-            updateTotals();
-        } else {
-            QMessageBox::warning(this, "Not Found", "Product name not found.");
-        }
-    }
-
-    ui->lineEditProductName->clear();
-    ui->lineEditQuantity->clear();
-    ui->lineEditProductName->setFocus();
-}
-
-void MainWindow::recalculateTotals() {
-    double subtotal = 0.0;
-
-    int rowCount = ui->tableCart->rowCount();
-
-    for (int row = 0; row < rowCount; ++row) {
-        QTableWidgetItem *totalItem = ui->tableCart->item(row, 3); // Assuming column 3 holds total price
-        if (totalItem) {
-            subtotal += totalItem->text().toDouble();
-        }
-    }
-
-    double tax = subtotal * 0.05;
-    double grandTotal = subtotal + tax;
-
-    ui->labelSubtotal->setText(QString::number(subtotal, 'f', 2));
-    ui->labelTax->setText(QString::number(tax, 'f', 2));
-    ui->labelTotal->setText(QString::number(grandTotal, 'f', 2));
-}
-
 
 void MainWindow::showBillInMessageBox()
 {
@@ -346,20 +266,15 @@ void MainWindow::showBillInMessageBox()
     bill += "======================================\n";
     bill += "      Thank you for shopping with us!\n";
 
-    // 🧱 Create a custom message box with fixed size
     QMessageBox *msgBox = new QMessageBox(this);
     msgBox->setWindowTitle("Bill");
-    msgBox->setTextFormat(Qt::PlainText); // Makes sure it's not rich text
+    msgBox->setTextFormat(Qt::PlainText);
     msgBox->setText(bill);
     msgBox->setStandardButtons(QMessageBox::Ok);
-
-    // ✅ Make the size bigger and fixed
     msgBox->setMinimumSize(600, 400);
     msgBox->setStyleSheet("QLabel{min-width: 580px; min-height: 360px;}");
-
     msgBox->exec();
 }
-
 
 void MainWindow::on_removeButton_clicked()
 {
@@ -368,7 +283,6 @@ void MainWindow::on_removeButton_clicked()
     if (selectedRow >= 0) {
         QString productName = ui->tableCart->item(selectedRow, 0)->text();
 
-        // Find the matching product code from the name
         int codeToRemove = -1;
         for (auto it = productCatalog.begin(); it != productCatalog.end(); ++it) {
             if (it.value().name == productName) {
@@ -378,14 +292,52 @@ void MainWindow::on_removeButton_clicked()
         }
 
         if (codeToRemove != -1) {
-            cart.remove(codeToRemove); // Remove from the cart map
+            cart.remove(codeToRemove);
         }
 
-        ui->tableCart->removeRow(selectedRow); // Remove from UI
-        updateTotals(); // Properly update totals using cart data
+        ui->tableCart->removeRow(selectedRow);
+        updateTotals();
     } else {
         QMessageBox::warning(this, "No Selection", "Please select an item to remove.");
     }
 }
 
+void MainWindow::on_buttonAdmin_clicked()
+{
+    bool ok;
+    QString password = QInputDialog::getText(this, "Admin Login", "Enter admin password:", QLineEdit::Password, "", &ok);
+    if (ok && password == "admin123") {
+        AdminWindow *admin = new AdminWindow(this);
+        admin->exec();
+        loadProductsFromDatabase();
+    } else if (ok) {
+        QMessageBox::warning(this, "Access Denied", "Incorrect password.");
+    }
+}
 
+void MainWindow::on_buttonRefreshCatalog_clicked()
+{
+    ui->tableCatalog->setRowCount(0);
+    productCatalog.clear();
+    loadProductsFromDatabase();
+}
+
+void MainWindow::recalculateTotals() {
+    double subtotal = 0.0;
+
+    int rowCount = ui->tableCart->rowCount();
+
+    for (int row = 0; row < rowCount; ++row) {
+        QTableWidgetItem *totalItem = ui->tableCart->item(row, 3);
+        if (totalItem) {
+            subtotal += totalItem->text().toDouble();
+        }
+    }
+
+    double tax = subtotal * 0.05;
+    double grandTotal = subtotal + tax;
+
+    ui->labelSubtotal->setText(QString::number(subtotal, 'f', 2));
+    ui->labelTax->setText(QString::number(tax, 'f', 2));
+    ui->labelTotal->setText(QString::number(grandTotal, 'f', 2));
+}
