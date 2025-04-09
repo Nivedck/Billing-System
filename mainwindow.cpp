@@ -292,6 +292,27 @@ void MainWindow::tryAddToCart()
     ui->lineEditProductName->setFocus();
 }
 
+void MainWindow::recalculateTotals() {
+    double subtotal = 0.0;
+
+    int rowCount = ui->tableCart->rowCount();
+
+    for (int row = 0; row < rowCount; ++row) {
+        QTableWidgetItem *totalItem = ui->tableCart->item(row, 3); // Assuming column 3 holds total price
+        if (totalItem) {
+            subtotal += totalItem->text().toDouble();
+        }
+    }
+
+    double tax = subtotal * 0.05;
+    double grandTotal = subtotal + tax;
+
+    ui->labelSubtotal->setText(QString::number(subtotal, 'f', 2));
+    ui->labelTax->setText(QString::number(tax, 'f', 2));
+    ui->labelTotal->setText(QString::number(grandTotal, 'f', 2));
+}
+
+
 void MainWindow::showBillInMessageBox()
 {
     QString bill;
@@ -337,6 +358,34 @@ void MainWindow::showBillInMessageBox()
     msgBox->setStyleSheet("QLabel{min-width: 580px; min-height: 360px;}");
 
     msgBox->exec();
+}
+
+
+void MainWindow::on_removeButton_clicked()
+{
+    int selectedRow = ui->tableCart->currentRow();
+
+    if (selectedRow >= 0) {
+        QString productName = ui->tableCart->item(selectedRow, 0)->text();
+
+        // Find the matching product code from the name
+        int codeToRemove = -1;
+        for (auto it = productCatalog.begin(); it != productCatalog.end(); ++it) {
+            if (it.value().name == productName) {
+                codeToRemove = it.key();
+                break;
+            }
+        }
+
+        if (codeToRemove != -1) {
+            cart.remove(codeToRemove); // Remove from the cart map
+        }
+
+        ui->tableCart->removeRow(selectedRow); // Remove from UI
+        updateTotals(); // Properly update totals using cart data
+    } else {
+        QMessageBox::warning(this, "No Selection", "Please select an item to remove.");
+    }
 }
 
 
