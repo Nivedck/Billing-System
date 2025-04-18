@@ -10,12 +10,131 @@
     <height>961</height>
    </rect>
   </property>
+  <property name="windowTitle">
+   <string>Product Administration</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">/* Main window background */
+    QDialog {
+    background-color: #2d3748;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    /* Table styling */
+    QTableWidget {
+    background-color: #2d3748;
+    border-radius: 8px;
+    gridline-color: #e0e0e0;
+    selection-background-color: #2d3748;
+    selection-color: #1976d2;
+    font-size: 14px;
+    border: 1px solid #e0e0e0;
+    }
+
+    QTableWidget QHeaderView::section {
+    background-color: #1976d2;
+    color: white;
+    padding: 8px;
+    border: none;
+    font-weight: 500;
+    }
+
+    QTableWidget::item {
+    padding: 8px;
+    }
+
+    /* Form elements styling */
+    QLineEdit {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 14px;
+    min-width: 120px;
+    background-color: white;
+    }
+
+    QLineEdit:focus {
+    border: 1px solid #1976d2;
+    outline: none;
+    }
+
+    QLabel {
+    font-size: 14px;
+    color: #495057;
+    font-weight: 500;
+    }
+
+    /* Button styling */
+    QPushButton {
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 120px;
+    }
+
+    QPushButton:hover {
+    background-color: #1565c0;
+    }
+
+    QPushButton:pressed {
+    background-color: #0d47a1;
+    }
+
+    /* Special buttons */
+    #buttonAdd {
+    background-color: #4caf50;
+    }
+
+    #buttonAdd:hover {
+    background-color: #3d8b40;
+    }
+
+    #buttonDelete {
+    background-color: #f44336;
+    }
+
+    #buttonDelete:hover {
+    background-color: #d32f2f;
+    }
+
+    /* Layout spacing */
+    QVBoxLayout {
+    spacing: 20px;
+    margin: 20px;
+    }
+
+    QHBoxLayout {
+    spacing: 15px;
+    }</string>
+  </property>
 
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTableWidget" name="tableWidget">
+      <property name="styleSheet">
+       <string notr="true">alternate-background-color: #f8f9fa;</string>
+      </property>
+      <property name="alternatingRowColors">
+       <bool>true</bool>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectRows</enum>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SingleSelection</enum>
+      </property>
+      <property name="showGrid">
+       <bool>true</bool>
+      </property>
       <attribute name="horizontalHeaderStretchLastSection">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="horizontalHeaderHighlightSections">
        <bool>false</bool>
       </attribute>
       <column>
@@ -45,7 +164,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEditCode"/>
+       <widget class="QLineEdit" name="lineEditCode">
+        <property name="placeholderText">
+         <string>Enter product code</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="labelName">
@@ -55,7 +178,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEditName"/>
+       <widget class="QLineEdit" name="lineEditName">
+        <property name="placeholderText">
+         <string>Enter product name</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="labelPrice">
@@ -65,7 +192,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEditPrice"/>
+       <widget class="QLineEdit" name="lineEditPrice">
+        <property name="placeholderText">
+         <string>Enter product price</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>

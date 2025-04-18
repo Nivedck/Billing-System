@@ -11,7 +11,7 @@
             </rect>
         </property>
         <property name="windowTitle">
-            <string>Point of Sale System</string>
+            <string>Billing System </string>
         </property>
         <property name="styleSheet">
             <string notr="true">/* Main window styling */
