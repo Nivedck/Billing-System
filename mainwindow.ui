@@ -1,430 +1,266 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-    <class>MainWindow</class>
-    <widget class="QMainWindow" name="MainWindow">
-        <property name="geometry">
-            <rect>
-                <x>0</x>
-                <y>0</y>
-                <width>1321</width>
-                <height>724</height>
-            </rect>
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1200</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Billing System</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="mainLayout">
+    <item>
+     <layout class="QHBoxLayout" name="topLayout">
+      <item>
+       <widget class="QLabel" name="labelProductCatalog">
+        <property name="text">
+         <string>Product Catalog</string>
         </property>
-        <property name="windowTitle">
-            <string>Billing System </string>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-        <property name="styleSheet">
-            <string notr="true">/* Main window styling */
-                QMainWindow {
-                background-color: #2d3748;
-                font-family: 'Segoe UI', Arial, sans-serif;
-                }
-
-                /* Table styling */
-                QTableWidget {
-                background-color: #4a5568;
-                border-radius: 8px;
-                gridline-color: #718096;
-                selection-background-color: #4299e1;
-                selection-color: white;
-                font-size: 12px;
-                color: white;
-                border: 1px solid #4a5568;
-                }
-
-                QTableWidget QHeaderView::section {
-                background-color: #2d3748;
-                color: white;
-                padding: 8px;
-                border: none;
-                font-weight: 500;
-                font-size: 12px;
-                }
-
-                QTableWidget::item {
-                padding: 8px;
-                }
-
-                /* Form elements styling */
-                QLineEdit {
-                background-color: #4a5568;
-                border: 1px solid #718096;
-                border-radius: 4px;
-                padding: 8px;
-                font-size: 12px;
-                color: white;
-                min-width: 120px;
-                }
-
-                QLineEdit:focus {
-                border: 1px solid #4299e1;
-                outline: none;
-                }
-
-                QLabel {
-                font-size: 12px;
-                color: #e2e8f0;
-                font-weight: 500;
-                }
-
-                /* Button styling */
-                QPushButton {
-                background-color: #4299e1;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                padding: 8px 16px;
-                font-size: 12px;
-                font-weight: 500;
-                min-width: 100px;
-                }
-
-                QPushButton:hover {
-                background-color: #3182ce;
-                }
-
-                QPushButton:pressed {
-                background-color: #2b6cb0;
-                }
-
-                /* Special buttons */
-                #buttonAddToCart {
-                background-color: #48bb78;
-                }
-
-                #buttonAddToCart:hover {
-                background-color: #38a169;
-                }
-
-                #buttonCheckout {
-                background-color: #9f7aea;
-                }
-
-                #buttonCheckout:hover {
-                background-color: #805ad5;
-                }
-
-                #buttonClearCart {
-                background-color: #f56565;
-                }
-
-                #buttonClearCart:hover {
-                background-color: #e53e3e;
-                }
-
-                #buttonAdmin {
-                background-color: #ed8936;
-                }
-
-                #buttonAdmin:hover {
-                background-color: #dd6b20;
-                }
-
-                #removeButton {
-                background-color: #f56565;
-                }
-
-                #removeButton:hover {
-                background-color: #e53e3e;
-                }
-
-                /* Section labels */
-                #labelProductCatalog, #labelCart {
-                font-size: 14px;
-                font-weight: 600;
-                color: #e2e8f0;
-                }
-
-                /* Price labels */
-                #labelSubtotal, #labelTax, #labelTotal {
-                font-size: 13px;
-                font-weight: 500;
-                color: #e2e8f0;
-                }
-
-                #labelTotal {
-                font-weight: 600;
-                color: #9f7aea;
-                }</string>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
         </property>
-        <widget class="QWidget" name="centralwidget">
-            <widget class="QTableWidget" name="tableCatalog">
-                <property name="geometry">
-                    <rect>
-                        <x>90</x>
-                        <y>70</y>
-                        <width>501</width>
-                        <height>361</height>
-                    </rect>
-                </property>
-                <property name="alternatingRowColors">
-                    <bool>true</bool>
-                </property>
-                <property name="selectionBehavior">
-                    <enum>QAbstractItemView::SelectRows</enum>
-                </property>
-                <property name="selectionMode">
-                    <enum>QAbstractItemView::SingleSelection</enum>
-                </property>
-                <attribute name="horizontalHeaderStretchLastSection">
-                    <bool>true</bool>
-                </attribute>
-                <column>
-                    <property name="text">
-                        <string>Code</string>
-                    </property>
-                </column>
-                <column>
-                    <property name="text">
-                        <string>Name</string>
-                    </property>
-                </column>
-                <column>
-                    <property name="text">
-                        <string>Price</string>
-                    </property>
-                </column>
-            </widget>
-            <widget class="QTableWidget" name="tableCart">
-                <property name="geometry">
-                    <rect>
-                        <x>700</x>
-                        <y>70</y>
-                        <width>481</width>
-                        <height>361</height>
-                    </rect>
-                </property>
-                <property name="alternatingRowColors">
-                    <bool>true</bool>
-                </property>
-                <property name="selectionBehavior">
-                    <enum>QAbstractItemView::SelectRows</enum>
-                </property>
-                <property name="selectionMode">
-                    <enum>QAbstractItemView::SingleSelection</enum>
-                </property>
-                <attribute name="horizontalHeaderStretchLastSection">
-                    <bool>true</bool>
-                </attribute>
-                <column>
-                    <property name="text">
-                        <string>Item</string>
-                    </property>
-                </column>
-                <column>
-                    <property name="text">
-                        <string>Qty</string>
-                    </property>
-                </column>
-                <column>
-                    <property name="text">
-                        <string>Price</string>
-                    </property>
-                </column>
-                <column>
-                    <property name="text">
-                        <string>Total</string>
-                    </property>
-                </column>
-            </widget>
-            <widget class="QLineEdit" name="lineEditProductName">
-                <property name="geometry">
-                    <rect>
-                        <x>260</x>
-                        <y>490</y>
-                        <width>113</width>
-                        <height>32</height>
-                    </rect>
-                </property>
-                <property name="placeholderText">
-                    <string>Product name</string>
-                </property>
-            </widget>
-            <widget class="QLineEdit" name="lineEditQuantity">
-                <property name="geometry">
-                    <rect>
-                        <x>260</x>
-                        <y>540</y>
-                        <width>113</width>
-                        <height>32</height>
-                    </rect>
-                </property>
-                <property name="placeholderText">
-                    <string>Quantity</string>
-                </property>
-            </widget>
-            <widget class="QLabel" name="labelSubtotal">
-                <property name="geometry">
-                    <rect>
-                        <x>1022</x>
-                        <y>460</y>
-                        <width>131</width>
-                        <height>21</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Subtotal: ₹0.00</string>
-                </property>
-            </widget>
-            <widget class="QLabel" name="labelTax">
-                <property name="geometry">
-                    <rect>
-                        <x>1022</x>
-                        <y>490</y>
-                        <width>131</width>
-                        <height>21</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Tax (5%): ₹0.00</string>
-                </property>
-            </widget>
-            <widget class="QLabel" name="labelTotal">
-                <property name="geometry">
-                    <rect>
-                        <x>1022</x>
-                        <y>520</y>
-                        <width>131</width>
-                        <height>21</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Total: ₹0.00</string>
-                </property>
-            </widget>
-            <widget class="QLabel" name="labelProductCode">
-                <property name="geometry">
-                    <rect>
-                        <x>130</x>
-                        <y>490</y>
-                        <width>101</width>
-                        <height>21</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Product Name</string>
-                </property>
-            </widget>
-            <widget class="QLabel" name="labelQuantity">
-                <property name="geometry">
-                    <rect>
-                        <x>130</x>
-                        <y>540</y>
-                        <width>73</width>
-                        <height>21</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Quantity</string>
-                </property>
-            </widget>
-            <widget class="QPushButton" name="buttonAddToCart">
-                <property name="geometry">
-                    <rect>
-                        <x>420</x>
-                        <y>620</y>
-                        <width>101</width>
-                        <height>32</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Add to Cart</string>
-                </property>
-            </widget>
-            <widget class="QPushButton" name="buttonCheckout">
-                <property name="geometry">
-                    <rect>
-                        <x>600</x>
-                        <y>620</y>
-                        <width>101</width>
-                        <height>32</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Checkout</string>
-                </property>
-            </widget>
-            <widget class="QPushButton" name="buttonClearCart">
-                <property name="geometry">
-                    <rect>
-                        <x>770</x>
-                        <y>620</y>
-                        <width>101</width>
-                        <height>32</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Clear Cart</string>
-                </property>
-            </widget>
-            <widget class="QLabel" name="labelProductCatalog">
-                <property name="geometry">
-                    <rect>
-                        <x>90</x>
-                        <y>40</y>
-                        <width>191</width>
-                        <height>31</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Product Catalogue</string>
-                </property>
-            </widget>
-            <widget class="QLabel" name="labelCart">
-                <property name="geometry">
-                    <rect>
-                        <x>700</x>
-                        <y>40</y>
-                        <width>191</width>
-                        <height>31</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Cart</string>
-                </property>
-            </widget>
-            <widget class="QPushButton" name="buttonAdmin">
-                <property name="geometry">
-                    <rect>
-                        <x>1190</x>
-                        <y>10</y>
-                        <width>105</width>
-                        <height>30</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Admin Panel</string>
-                </property>
-            </widget>
-            <widget class="QPushButton" name="buttonRefreshCatalog">
-                <property name="geometry">
-                    <rect>
-                        <x>90</x>
-                        <y>430</y>
-                        <width>105</width>
-                        <height>30</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Refresh</string>
-                </property>
-            </widget>
-            <widget class="QPushButton" name="removeButton">
-                <property name="geometry">
-                    <rect>
-                        <x>860</x>
-                        <y>450</y>
-                        <width>105</width>
-                        <height>30</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Remove Item</string>
-                </property>
-            </widget>
-        </widget>
-        <widget class="QStatusBar" name="statusbar"/>
-    </widget>
-    <resources/>
-    <connections/>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="buttonAdmin">
+        <property name="text">
+         <string>Admin Panel</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="tablesLayout">
+      <item>
+       <widget class="QTableWidget" name="tableCatalog">
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>Code</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Name</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Price</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="tableCart">
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>Item</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Qty</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Price</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Total</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="controlsLayout">
+      <item>
+       <widget class="QPushButton" name="buttonRefreshCatalog">
+        <property name="text">
+         <string>Refresh</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelProductCode">
+        <property name="text">
+         <string>Product Name</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEditProductName">
+        <property name="placeholderText">
+         <string>Product name</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelQuantity">
+        <property name="text">
+         <string>Quantity</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEditQuantity">
+        <property name="placeholderText">
+         <string>Quantity</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="buttonAddToCart">
+        <property name="text">
+         <string>Add to Cart</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="cartControlsLayout">
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="removeButton">
+        <property name="text">
+         <string>Remove Item</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="buttonClearCart">
+        <property name="text">
+         <string>Clear Cart</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="totalsLayout">
+      <item>
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelSubtotal">
+        <property name="text">
+         <string>Subtotal: ₹0.00</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelTax">
+        <property name="text">
+         <string>Tax (5%): ₹0.00</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelTotal">
+        <property name="text">
+         <string>Total: ₹0.00</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="checkoutLayout">
+      <item>
+       <spacer name="horizontalSpacer_5">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="buttonCheckout">
+        <property name="text">
+         <string>Checkout</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
 </ui>

@@ -1,26 +1,26 @@
 /* General Styles */
 QWidget {
-    background-color: #2E2E2E;
-    color: #FFFFFF;
+    background-color: #F5F5F5;
+    color: #333333;
     font-family: "Segoe UI";
     font-size: 10pt;
 }
 
 /* Main Window and Dialogs */
 QMainWindow, QDialog {
-    background-color: #2E2E2E;
+    background-color: #F5F5F5;
 }
 
 /* Labels */
 QLabel {
-    color: #FFFFFF;
+    color: #333333;
 }
 
 /* Input Fields */
 QLineEdit, QTextEdit {
-    background-color: #3C3C3C;
-    color: #FFFFFF;
-    border: 1px solid #555555;
+    background-color: #FFFFFF;
+    color: #333333;
+    border: 1px solid #CCCCCC;
     border-radius: 4px;
     padding: 5px;
 }
@@ -48,17 +48,17 @@ QPushButton:pressed {
 
 /* Table Widgets */
 QTableWidget {
-    background-color: #3C3C3C;
-    color: #FFFFFF;
-    gridline-color: #555555;
-    border: 1px solid #555555;
+    background-color: #FFFFFF;
+    color: #333333;
+    gridline-color: #CCCCCC;
+    border: 1px solid #CCCCCC;
 }
 
 QHeaderView::section {
-    background-color: #2E2E2E;
-    color: #FFFFFF;
+    background-color: #F5F5F5;
+    color: #333333;
     padding: 4px;
-    border: 1px solid #555555;
+    border: 1px solid #CCCCCC;
 }
 
 QTableWidget::item {
@@ -72,11 +72,9 @@ QTableWidget::item:selected {
 
 /* Message Box */
 QMessageBox {
-    background-color: #2E2E2E;
+    background-color: #F5F5F5;
 }
 
 QMessageBox QLabel {
-    color: #FFFFFF;
-    min-width: 580px; /* Keep the user's custom size */
-    min-height: 360px;
+    color: #333333;
 }
