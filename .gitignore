@@ -80,3 +80,62 @@ CMakeLists.txt.user*
 .rcc/
 .uic/
 /build*/
+
+
+# Ignore build artifacts
+*.o
+*.obj
+*.so
+*.a
+*.moc
+*.qrc
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+Makefile
+Billing-System
+build/
+
+# Qt Creator user files
+*.pro.user
+*.autosave
+
+# Database files (optional)
+*.db
+
+# Logs, temporary, etc.
+*.log
+*.bak
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Build files and binaries
+*.o
+*.obj
+*.moc
+*.qrc
+*.a
+*.so
+Makefile
+Billing-System
+
+# Auto-generated UI and MOC files
+moc_*.cpp
+moc_*.o
+ui_*.h
+qrc_*.cpp
+qrc_*.o
+
+# Qt Creator user-specific settings
+*.pro.user
+*.autosave
+
+# Build folders
+build/
+Desktop-Debug/
+
+# Optional files
+*.db
+*.log
