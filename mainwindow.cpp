@@ -304,12 +304,17 @@ void MainWindow::on_removeButton_clicked()
 
 void MainWindow::on_buttonAdmin_clicked()
 {
+    if (adminWindow && adminWindow->isVisible()) {
+        adminWindow->raise();
+        adminWindow->activateWindow();
+        return;
+    }
+
     bool ok;
     QString password = QInputDialog::getText(this, "Admin Login", "Enter admin password:", QLineEdit::Password, "", &ok);
-    if (ok && password == "admin123") {
-        AdminWindow *admin = new AdminWindow(this);
-        admin->exec();
-        loadProductsFromDatabase();
+    if (ok && password == "nivedck") {
+        adminWindow = new AdminWindow(this);
+        adminWindow->show();
     } else if (ok) {
         QMessageBox::warning(this, "Access Denied", "Incorrect password.");
     }

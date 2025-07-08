@@ -23,7 +23,7 @@ private slots:
 
 private:
     Ui::AdminWindow *ui;
-    void loadProducts();    // ✅ This line is required!
+    void loadProducts();
 };
 
-#endif // ADMINWINDOW_H
+#endif
