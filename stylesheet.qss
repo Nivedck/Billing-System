@@ -1,0 +1,82 @@
+/* General Styles */
+QWidget {
+    background-color: #2E2E2E;
+    color: #FFFFFF;
+    font-family: "Segoe UI";
+    font-size: 10pt;
+}
+
+/* Main Window and Dialogs */
+QMainWindow, QDialog {
+    background-color: #2E2E2E;
+}
+
+/* Labels */
+QLabel {
+    color: #FFFFFF;
+}
+
+/* Input Fields */
+QLineEdit, QTextEdit {
+    background-color: #3C3C3C;
+    color: #FFFFFF;
+    border: 1px solid #555555;
+    border-radius: 4px;
+    padding: 5px;
+}
+
+QLineEdit:focus, QTextEdit:focus {
+    border: 1px solid #0078D7;
+}
+
+/* Buttons */
+QPushButton {
+    background-color: #0078D7;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+}
+
+QPushButton:hover {
+    background-color: #005A9E;
+}
+
+QPushButton:pressed {
+    background-color: #003A64;
+}
+
+/* Table Widgets */
+QTableWidget {
+    background-color: #3C3C3C;
+    color: #FFFFFF;
+    gridline-color: #555555;
+    border: 1px solid #555555;
+}
+
+QHeaderView::section {
+    background-color: #2E2E2E;
+    color: #FFFFFF;
+    padding: 4px;
+    border: 1px solid #555555;
+}
+
+QTableWidget::item {
+    padding: 5px;
+}
+
+QTableWidget::item:selected {
+    background-color: #0078D7;
+    color: #FFFFFF;
+}
+
+/* Message Box */
+QMessageBox {
+    background-color: #2E2E2E;
+}
+
+QMessageBox QLabel {
+    color: #FFFFFF;
+    min-width: 580px; /* Keep the user's custom size */
+    min-height: 360px;
+}
