@@ -13,7 +13,7 @@ AdminWindow::AdminWindow(QWidget *parent)
     ui->tableWidget->setColumnCount(3);
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Code" << "Name" << "Price");
 
-    loadProducts();    // Optional size adjustment
+    loadProducts();
 }
 
 AdminWindow::~AdminWindow()
@@ -23,7 +23,7 @@ AdminWindow::~AdminWindow()
 
 void AdminWindow::loadProducts()
 {
-    ui->tableWidget->setRowCount(0);  // Clear existing rows
+    ui->tableWidget->setRowCount(0);
 
     QSqlQuery query("SELECT code, name, price FROM products");
 
@@ -54,7 +54,7 @@ void AdminWindow::on_buttonAdd_clicked()
         QMessageBox::warning(this, "Error", "Failed to add product.");
     } else {
         QMessageBox::information(this, "Success", "Product added.");
-        loadProducts();  // 🔥 Add this line
+        loadProducts();
     }
 
 
@@ -81,7 +81,7 @@ void AdminWindow::on_buttonUpdate_clicked()
         QMessageBox::information(this, "Not Found", "Product not found.");
     } else {
         QMessageBox::information(this, "Success", "Product updated.");
-        loadProducts();  // 🔥 Add this
+        loadProducts();
     }
 
 }
@@ -100,7 +100,7 @@ void AdminWindow::on_buttonDelete_clicked()
         QMessageBox::information(this, "Not Found", "No product with that code.");
     } else {
         QMessageBox::information(this, "Deleted", "Product deleted.");
-        loadProducts();  // 🔥 Add this
+        loadProducts();
     }
 
 

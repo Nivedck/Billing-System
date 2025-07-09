@@ -44,13 +44,13 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    QMap<int, Product> productCatalog;  // Key = Product Code
-    QMap<int, int> cart; // Key = Product Code, Value = Quantity
+    QMap<int, Product> productCatalog;
+    QMap<int, int> cart;
     void updateCartDisplay();
     void updateTotals();
     void connectToDatabase();
     void loadProductsFromDatabase();
-    AdminWindow *adminWindow;  // Pointer to the admin window
+    AdminWindow *adminWindow;
     QCompleter *completer;
     QStringListModel *model;
     void setupAutoComplete();
