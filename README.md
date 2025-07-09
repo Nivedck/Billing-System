@@ -2,7 +2,7 @@
 
 A simple supermarket billing system with a GUI built using **Qt** and **C++**. This app allows a cashier to select products, calculate totals (including tax), and manage a cart-based billing flow with real-time product search, an admin panel, and a database-driven catalog.
 
-![Screenshot](screenshot.png)
+![Screenshot](resources/screenshot.png)
 
 ## ✨ Features
 
