@@ -1,103 +1,73 @@
-# 📟 Billing-System (Qt C++)
+# Billing System
 
-A simple supermarket billing system with a GUI built using **Qt** and **C++**. This app allows a cashier to select products, calculate totals (including tax), and manage a cart-based billing flow with real-time product search, an admin panel, and a database-driven catalog.
+A simple and efficient billing system designed for small to medium-sized businesses. Built with C++ and the Qt framework, it provides a user-friendly interface for managing products and processing sales.
 
 ![Screenshot](resources/screenshot.png)
 
-## ✨ Features
+## Features
 
-- Product catalog loaded from **SQLite** database
-- Add items to cart by entering **product name** with auto-suggestions
-- **Admin Panel** to add and delete products from the database
-- Auto-calculates subtotal, tax (5%), and total
-- Displays itemized bill with price and quantity
-- Clean Qt-based user interface (QTableWidgets, QLabel, QPushButton, etc.)
+*   **Product Management:** Easily add, update, and delete products from the database through a secure admin panel.
+*   **Billing:** A streamlined process for adding products to a cart, calculating the total cost (including tax), and generating a bill.
+*   **Search with Autocomplete:** Quickly find products by name with the help of an autocomplete feature.
+*   **Database Integration:** Uses SQLite to store and manage product information.
+*   **User-Friendly Interface:** A clean and intuitive graphical user interface built with Qt.
 
----
+## Getting Started
 
-## 🛠️ Tech Stack
+### Prerequisites
 
-- **Language**: C++
-- **Framework**: Qt 6 / Qt 5 (QtWidgets)
-- **Database**: SQLite
-- **IDE**: Qt Creator
+*   C++ compiler (g++, clang, etc.)
+*   Qt 6 or Qt 5 (QtWidgets)
+*   SQLite
 
----
+### Building and Running
 
-## 📁 Project Structure
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/Nivedck/Billing-System.git
+    cd Billing-System
+    ```
 
-```bash
-Billing-System/
-├── main.cpp
-├── mainwindow.cpp
-├── mainwindow.h
-├── mainwindow.ui
-├── adminwindow.cpp
-├── adminwindow.h
-├── adminwindow.ui
-├── products.db
-├── Billing-System.pro
-└── README.md
-```
+2.  **Open in Qt Creator:**
+    *   Open the `Billing-System.pro` file in Qt Creator.
+    *   Configure the project with your Qt kit.
+    *   Build and run the project.
 
-## 🚀 Getting Started
-Clone the Repository
+3.  **Command line (with qmake):**
+    ```bash
+    qmake
+    make
+    ./Billing-System
+    ```
 
-```bash
-Copy
-Edit
-git clone https://github.com/Nivedck/Billing-System.git
-cd Billing-System
-```
-2. **Open in Qt Creator**
+## How to Use
 
- - Open `Billing-System.pro` in **Qt Creator**
+### Admin Panel
 
- - Build and Run the project
+1.  Click the "Admin" button on the main window.
+2.  Enter the admin password (the default is `nivedck`) to access the admin panel.
+3.  In the admin panel, you can:
+    *   **Add a product:** Fill in the product code, name, and price, then click "Add".
+    *   **Update a product:** Enter the product code of the item you want to update, fill in the new name and price, then click "Update".
+    *   **Delete a product:** Enter the product code of the item you want to delete, then click "Delete".
 
-**Database**
+### Billing
 
-A sample products.db file is included
+1.  **Add products to the cart:**
+    *   Enter the product name in the "Product Name" field. The autocomplete feature will suggest matching products.
+    *   Enter the quantity and press "Add to Cart".
+2.  **Manage the cart:**
+    *   The cart contents are displayed in a table.
+    *   To remove an item, select it in the table and click "Remove".
+    *   To clear the entire cart, click "Clear Cart".
+3.  **Checkout:**
+    *   Click "Checkout" to finalize the sale.
+    *   A bill will be displayed with the total amount.
 
-Use the Admin Panel to manage the catalog
+## Contributing
 
----
+Contributions are welcome! If you have any ideas, suggestions, or bug reports, please open an issue or create a pull request.
 
-## 🛒 Demo Product Catalog
+## License
 
-| Code | Product | Price (₹) |
-|------|---------|-----------|
-| 101  | Apple   | 10.00     |
-| 102  | Milk    | 25.00     |
-| 103  | Bread   | 20.00     |
-| 104  | Eggs    | 5.00      |
-| 105  | Butter  | 40.00     |
-| 106  | Rice    | 60.00     |
-| 107  | Sugar   | 30.00     |
-| 108  | Salt    | 15.00     |
-| 109  | Soap    | 35.00     |
-| 110  | Tea     | 50.00     |
-
----
-
-
-##✅ To Do
-
- - Basic UI and logic   ✅
-
- - Connect to database (SQLite)  ✅
-
- - Admin Panel to manage products ✅
-
- - Product search with suggestions ✅
-
- - Remove item from cart
-
- - Save/print bill
-
- - Add barcode scanner support
-
-
-📄 License
-MIT License
-
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
