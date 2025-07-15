@@ -108,3 +108,6 @@ void AdminWindow::on_buttonDelete_clicked()
     ui->lineEditName->clear();
     ui->lineEditPrice->clear();
 }
+
+//adminwindow 
+//github.com/Nivedck
