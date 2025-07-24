@@ -83,6 +83,9 @@ void MainWindow::connectToDatabase() {
 
 void MainWindow::loadProductsFromDatabase()
 {
+    ui->tableCatalog->setRowCount(0); // Clear existing rows
+    productCatalog.clear(); // Clear existing product data
+
     QSqlQuery query("SELECT product_id, name, price FROM products");
     while (query.next()) {
         int productId = query.value(0).toInt();
