@@ -19,11 +19,14 @@ private slots:
     void on_buttonDelete_clicked();
     void on_buttonUpdate_clicked();
     void on_buttonAdd_clicked();
+    void on_buttonAddAdmin_clicked();
+    void on_buttonDeleteAdmin_clicked();
 
 
 private:
     Ui::AdminWindow *ui;
     void loadProducts();
+    void loadAdmins();
 };
 
 #endif

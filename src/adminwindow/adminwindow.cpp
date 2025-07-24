@@ -3,6 +3,7 @@
 
 #include <QSqlQuery>
 #include <QMessageBox>
+#include <QCryptographicHash>
 
 AdminWindow::AdminWindow(QWidget *parent)
     : QDialog(parent)
@@ -12,8 +13,11 @@ AdminWindow::AdminWindow(QWidget *parent)
     this->setFixedSize(600, 400);
     ui->tableWidget->setColumnCount(3);
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "ID" << "Name" << "Price");
+    ui->tableWidgetAdmins->setColumnCount(2);
+    ui->tableWidgetAdmins->setHorizontalHeaderLabels(QStringList() << "ID" << "Username");
 
     loadProducts();
+    loadAdmins();
 }
 
 AdminWindow::~AdminWindow()
@@ -33,6 +37,21 @@ void AdminWindow::loadProducts()
         ui->tableWidget->setItem(row, 0, new QTableWidgetItem(query.value(0).toString()));
         ui->tableWidget->setItem(row, 1, new QTableWidgetItem(query.value(1).toString()));
         ui->tableWidget->setItem(row, 2, new QTableWidgetItem(query.value(2).toString()));
+        row++;
+    }
+}
+
+void AdminWindow::loadAdmins()
+{
+    ui->tableWidgetAdmins->setRowCount(0);
+
+    QSqlQuery query("SELECT id, username FROM admins");
+
+    int row = 0;
+    while (query.next()) {
+        ui->tableWidgetAdmins->insertRow(row);
+        ui->tableWidgetAdmins->setItem(row, 0, new QTableWidgetItem(query.value(0).toString()));
+        ui->tableWidgetAdmins->setItem(row, 1, new QTableWidgetItem(query.value(1).toString()));
         row++;
     }
 }
@@ -107,5 +126,54 @@ void AdminWindow::on_buttonDelete_clicked()
     ui->lineEditPrice->clear();
 }
 
-//adminwindow 
-//github.com/Nivedck
+void AdminWindow::on_buttonAddAdmin_clicked()
+{
+    QString username = ui->lineEditAdminUsername->text();
+    QString password = ui->lineEditAdminPassword->text();
+
+    if (username.isEmpty() || password.isEmpty()) {
+        QMessageBox::warning(this, "Input Error", "Please enter both username and password.");
+        return;
+    }
+
+    QString passwordHash = QString(QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256).toHex());
+
+    QSqlQuery query;
+    query.prepare("INSERT INTO admins (username, password_hash) VALUES (?, ?)");
+    query.addBindValue(username);
+    query.addBindValue(passwordHash);
+
+    if (!query.exec()) {
+        QMessageBox::warning(this, "Error", "Failed to add admin.");
+    } else {
+        QMessageBox::information(this, "Success", "Admin added.");
+        loadAdmins();
+    }
+
+    ui->lineEditAdminUsername->clear();
+    ui->lineEditAdminPassword->clear();
+}
+
+void AdminWindow::on_buttonDeleteAdmin_clicked()
+{
+    int selectedRow = ui->tableWidgetAdmins->currentRow();
+
+    if (selectedRow >= 0) {
+        int adminId = ui->tableWidgetAdmins->item(selectedRow, 0)->text().toInt();
+
+        QSqlQuery query;
+        query.prepare("DELETE FROM admins WHERE id = ?");
+        query.addBindValue(adminId);
+
+        if (!query.exec()) {
+            QMessageBox::warning(this, "Error", "Failed to delete admin.");
+        } else if (query.numRowsAffected() == 0) {
+            QMessageBox::information(this, "Not Found", "Admin not found.");
+        } else {
+            QMessageBox::information(this, "Deleted", "Admin deleted.");
+            loadAdmins();
+        }
+    } else {
+        QMessageBox::warning(this, "No Selection", "Please select an admin to delete.");
+    }
+}
