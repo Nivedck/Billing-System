@@ -6,10 +6,13 @@ A simple and efficient billing system designed for small to medium-sized busines
 
 ## Features
 
-*   **Product Management:** Easily add, update, and delete products from the database through a secure admin panel.
+*   **Product Management:** Easily add, update, and delete products, including managing their stock levels, through a secure admin panel.
+*   **Secure Admin Login:** Access to the admin panel is now protected by a robust login system with user management capabilities.
+*   **Admin User Management:** Create and delete administrator accounts directly from within the admin panel.
+*   **Stock Management:** Products now have a stock quantity, which is automatically decremented upon purchase. Stock levels are visible and manageable in the admin panel.
+*   **Clear Database Option:** A powerful option in the admin panel to clear all transactional and product data, allowing for a fresh start.
 *   **Billing:** A streamlined process for adding products to a cart, calculating the total cost (including tax), and generating a bill.
 *   **Search with Autocomplete:** Quickly find products by name with the help of an autocomplete feature.
-*   **Database Integration:** Uses SQLite to store and manage product information.
 *   **User-Friendly Interface:** A clean and intuitive graphical user interface built with Qt.
 
 ## Getting Started
@@ -44,24 +47,24 @@ A simple and efficient billing system designed for small to medium-sized busines
 
 ### Admin Panel
 
-1.  Click the "Admin" button on the main window.
-2.  Enter the admin password (the default is `nivedck`) to access the admin panel.
-3.  In the admin panel, you can:
-    *   **Add a product:** Fill in the product code, name, and price, then click "Add".
-    *   **Update a product:** Enter the product code of the item you want to update, fill in the new name and price, then click "Update".
-    *   **Delete a product:** Enter the product code of the item you want to delete, then click "Delete".
+1.  Click the "Admin Panel" button on the main window.
+2.  **Login:** Enter your admin username and password in the login dialog. The default credentials for the first run are `username: admin`, `password: admin`.
+3.  Once logged in, you can:
+    *   **Product Management:** Add new products, update existing product details (including name, price, and stock quantity), or delete products.
+    *   **Admin Management:** Switch to the "Admin Management" tab to add new admin users or delete existing ones.
+    *   **Clear Database:** Use the "Clear All Database Data" button with caution to reset all product, sales, and admin data (a default admin will be re-created).
 
 ### Billing
 
 1.  **Add products to the cart:**
     *   Enter the product name in the "Product Name" field. The autocomplete feature will suggest matching products.
-    *   Enter the quantity and press "Add to Cart".
+    *   Enter the quantity and press "Add to Cart". The system will check for available stock.
 2.  **Manage the cart:**
     *   The cart contents are displayed in a table.
-    *   To remove an item, select it in the table and click "Remove".
+    *   To remove an item, select it in the table and click "Remove Item".
     *   To clear the entire cart, click "Clear Cart".
 3.  **Checkout:**
-    *   Click "Checkout" to finalize the sale.
+    *   Click "Checkout" to finalize the sale. The stock quantity for purchased items will be automatically updated.
     *   A bill will be displayed with the total amount.
 
 ## Contributing
