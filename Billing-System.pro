@@ -12,17 +12,17 @@ INCLUDEPATH += src \
 SOURCES += \
     src/main.cpp \
     src/mainwindow/mainwindow.cpp \
-    src/adminwindow/adminwindow.cpp
+    src/adminwindow/adminwindow.cpp     src/adminwindow/logindialog.cpp
 
 # Header files
 HEADERS += \
     src/mainwindow/mainwindow.h \
-    src/adminwindow/adminwindow.h
+    src/adminwindow/adminwindow.h     src/adminwindow/logindialog.h
 
 # UI forms
 FORMS += \
     src/mainwindow/mainwindow.ui \
-    src/adminwindow/adminwindow.ui
+    src/adminwindow/adminwindow.ui     src/adminwindow/logindialog.ui
 
 # Qt resources
 RESOURCES += \

@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QTableWidgetItem>
 #include "adminwindow.h"
+#include "logindialog.h"
 #include <QCompleter>
 #include <QStringListModel>
 
@@ -54,7 +55,6 @@ private:
     QCompleter *completer;
     QStringListModel *model;
     void setupAutoComplete();
-    void addProductToCart(int code, const QString &name, double price);
 
 
 

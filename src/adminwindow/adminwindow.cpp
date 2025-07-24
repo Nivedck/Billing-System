@@ -11,7 +11,7 @@ AdminWindow::AdminWindow(QWidget *parent)
     ui->setupUi(this);
     this->setFixedSize(600, 400);
     ui->tableWidget->setColumnCount(3);
-    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Code" << "Name" << "Price");
+    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "ID" << "Name" << "Price");
 
     loadProducts();
 }
@@ -25,7 +25,7 @@ void AdminWindow::loadProducts()
 {
     ui->tableWidget->setRowCount(0);
 
-    QSqlQuery query("SELECT code, name, price FROM products");
+    QSqlQuery query("SELECT product_id, name, price FROM products");
 
     int row = 0;
     while (query.next()) {
@@ -40,13 +40,11 @@ void AdminWindow::loadProducts()
 
 void AdminWindow::on_buttonAdd_clicked()
 {
-    int code = ui->lineEditCode->text().toInt();
     QString name = ui->lineEditName->text();
     double price = ui->lineEditPrice->text().toDouble();
 
     QSqlQuery query;
-    query.prepare("INSERT INTO products (code, name, price) VALUES (?, ?, ?)");
-    query.addBindValue(code);
+    query.prepare("INSERT INTO products (name, price) VALUES (?, ?)");
     query.addBindValue(name);
     query.addBindValue(price);
 
@@ -65,15 +63,15 @@ void AdminWindow::on_buttonAdd_clicked()
 
 void AdminWindow::on_buttonUpdate_clicked()
 {
-    int code = ui->lineEditCode->text().toInt();
+    int productId = ui->lineEditCode->text().toInt();
     QString name = ui->lineEditName->text();
     double price = ui->lineEditPrice->text().toDouble();
 
     QSqlQuery query;
-    query.prepare("UPDATE products SET name = ?, price = ? WHERE code = ?");
+    query.prepare("UPDATE products SET name = ?, price = ? WHERE product_id = ?");
     query.addBindValue(name);
     query.addBindValue(price);
-    query.addBindValue(code);
+    query.addBindValue(productId);
 
     if (!query.exec()) {
         QMessageBox::warning(this, "Error", "Failed to update product.");
@@ -88,16 +86,16 @@ void AdminWindow::on_buttonUpdate_clicked()
 
 void AdminWindow::on_buttonDelete_clicked()
 {
-    int code = ui->lineEditCode->text().toInt();
+    int productId = ui->lineEditCode->text().toInt();
 
     QSqlQuery query;
-    query.prepare("DELETE FROM products WHERE code = ?");
-    query.addBindValue(code);
+    query.prepare("DELETE FROM products WHERE product_id = ?");
+    query.addBindValue(productId);
 
     if (!query.exec()) {
         QMessageBox::warning(this, "Error", "Failed to delete product.");
     } else if (query.numRowsAffected() == 0) {
-        QMessageBox::information(this, "Not Found", "No product with that code.");
+        QMessageBox::information(this, "Not Found", "No product with that ID.");
     } else {
         QMessageBox::information(this, "Deleted", "Product deleted.");
         loadProducts();

@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "adminwindow.h"
+#include "logindialog.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
@@ -10,6 +11,7 @@
 #include <QDateTime>
 #include <QStringListModel>
 #include <QCompleter>
+#include <QCryptographicHash>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -42,24 +44,56 @@ void MainWindow::connectToDatabase() {
 
     QSqlQuery query;
     query.exec("CREATE TABLE IF NOT EXISTS products ("
-               "code INTEGER PRIMARY KEY, "
-               "name TEXT NOT NULL, "
+               "product_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+               "name TEXT NOT NULL UNIQUE, "
                "price REAL NOT NULL)");
+
+    query.exec("CREATE TABLE IF NOT EXISTS invoices ("
+               "invoice_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+               "timestamp TEXT NOT NULL, "
+               "total_amount REAL NOT NULL)");
+
+    query.exec("CREATE TABLE IF NOT EXISTS invoice_items ("
+               "invoice_item_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+               "invoice_id INTEGER NOT NULL, "
+               "product_id INTEGER NOT NULL, "
+               "quantity INTEGER NOT NULL, "
+               "price_at_purchase REAL NOT NULL, "
+               "FOREIGN KEY(invoice_id) REFERENCES invoices(invoice_id), "
+               "FOREIGN KEY(product_id) REFERENCES products(product_id))");
+
+    query.exec("CREATE TABLE IF NOT EXISTS admins ("
+               "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+               "username TEXT NOT NULL UNIQUE, "
+               "password_hash TEXT NOT NULL)");
+
+    // Add a default admin if the table is empty
+    query.exec("SELECT COUNT(*) FROM admins");
+    if (query.next() && query.value(0).toInt() == 0) {
+        QString defaultUsername = "admin";
+        QString defaultPassword = "admin";
+        QString passwordHash = QString(QCryptographicHash::hash(defaultPassword.toUtf8(), QCryptographicHash::Sha256).toHex());
+
+        query.prepare("INSERT INTO admins (username, password_hash) VALUES (?, ?)");
+        query.addBindValue(defaultUsername);
+        query.addBindValue(passwordHash);
+        query.exec();
+    }
 }
 
 void MainWindow::loadProductsFromDatabase()
 {
-    QSqlQuery query("SELECT code, name, price FROM products");
+    QSqlQuery query("SELECT product_id, name, price FROM products");
     while (query.next()) {
-        int code = query.value(0).toInt();
+        int productId = query.value(0).toInt();
         QString name = query.value(1).toString();
         double price = query.value(2).toDouble();
 
-        productCatalog[code] = {name, price};
+        productCatalog[productId] = {name, price};
 
         int row = ui->tableCatalog->rowCount();
         ui->tableCatalog->insertRow(row);
-        ui->tableCatalog->setItem(row, 0, new QTableWidgetItem(QString::number(code)));
+        ui->tableCatalog->setItem(row, 0, new QTableWidgetItem(QString::number(productId)));
         ui->tableCatalog->setItem(row, 1, new QTableWidgetItem(name));
         ui->tableCatalog->setItem(row, 2, new QTableWidgetItem(QString("₹ %1").arg(price, 0, 'f', 2)));
     }
@@ -85,18 +119,7 @@ void MainWindow::setupAutoComplete()
     model->setStringList(names);
 }
 
-void MainWindow::addProductToCart(int code, const QString &name, double price)
-{
-    int qty = 1;
-    cart[code] += qty;
 
-    if (!productCatalog.contains(code)) {
-        productCatalog[code] = {name, price};
-    }
-
-    updateCartDisplay();
-    updateTotals();
-}
 
 void MainWindow::on_buttonAddToCart_clicked()
 {
@@ -111,33 +134,33 @@ void MainWindow::tryAddToCart()
     if (qty <= 0) qty = 1;
 
     if (input.isEmpty()) {
-        QMessageBox::warning(this, "Input Error", "Please enter a product code or name.");
+        QMessageBox::warning(this, "Input Error", "Please enter a product ID or name.");
         return;
     }
 
     bool ok;
-    int code = input.toInt(&ok);
+    int productId = input.toInt(&ok);
 
     if (ok) {
-        if (productCatalog.contains(code)) {
-            cart[code] += qty;
+        if (productCatalog.contains(productId)) {
+            cart[productId] += qty;
             updateCartDisplay();
             updateTotals();
         } else {
-            QMessageBox::warning(this, "Not Found", "Product code not found.");
+            QMessageBox::warning(this, "Not Found", "Product ID not found.");
         }
     } else {
         QSqlQuery query;
-        query.prepare("SELECT code, price FROM products WHERE name = ?");
+        query.prepare("SELECT product_id, price FROM products WHERE name = ?");
         query.addBindValue(input);
 
         if (query.exec() && query.next()) {
-            int code = query.value(0).toInt();
+            int productId = query.value(0).toInt();
             double price = query.value(1).toDouble();
-            cart[code] += qty;
+            cart[productId] += qty;
 
-            if (!productCatalog.contains(code)) {
-                productCatalog[code] = {input, price};
+            if (!productCatalog.contains(productId)) {
+                productCatalog[productId] = {input, price};
             }
 
             updateCartDisplay();
@@ -156,9 +179,9 @@ void MainWindow::updateCartDisplay()
 {
     ui->tableCart->setRowCount(0);
     for (auto it = cart.begin(); it != cart.end(); ++it) {
-        int code = it.key();
+        int productId = it.key();
         int qty = it.value();
-        const Product& product = productCatalog[code];
+        const Product& product = productCatalog[productId];
 
         int row = ui->tableCart->rowCount();
         ui->tableCart->insertRow(row);
@@ -178,9 +201,9 @@ void MainWindow::updateTotals()
     double subtotal = 0.0;
 
     for (auto it = cart.begin(); it != cart.end(); ++it) {
-        int code = it.key();
+        int productId = it.key();
         int qty = it.value();
-        subtotal += productCatalog[code].price * qty;
+        subtotal += productCatalog[productId].price * qty;
     }
 
     double tax = subtotal * 0.05;
@@ -205,25 +228,42 @@ void MainWindow::on_buttonCheckout_clicked()
         return;
     }
 
+    double subtotal = 0.0;
+    for (auto it = cart.begin(); it != cart.end(); ++it) {
+        int productId = it.key();
+        int qty = it.value();
+        subtotal += productCatalog[productId].price * qty;
+    }
+    double tax = subtotal * 0.05;
+    double totalAmount = subtotal + tax;
+
     QSqlQuery query;
     QString date = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
 
-    for (auto it = cart.begin(); it != cart.end(); ++it) {
-        int code = it.key();
-        int qty = it.value();
-        const Product& product = productCatalog[code];
-        double total = product.price * qty;
+    query.prepare("INSERT INTO invoices (timestamp, total_amount) VALUES (?, ?)");
+    query.addBindValue(date);
+    query.addBindValue(totalAmount);
+    if (!query.exec()) {
+        qDebug() << "Insert into invoices failed:" << query.lastError().text();
+        return;
+    }
 
-        query.prepare("INSERT INTO sales (date, product_name, quantity, price, total) "
-                      "VALUES (?, ?, ?, ?, ?)");
-        query.addBindValue(date);
-        query.addBindValue(product.name);
+    int invoiceId = query.lastInsertId().toInt();
+
+    for (auto it = cart.begin(); it != cart.end(); ++it) {
+        int productId = it.key();
+        int qty = it.value();
+        const Product& product = productCatalog[productId];
+
+        query.prepare("INSERT INTO invoice_items (invoice_id, product_id, quantity, price_at_purchase) "
+                      "VALUES (?, ?, ?, ?)");
+        query.addBindValue(invoiceId);
+        query.addBindValue(productId);
         query.addBindValue(qty);
         query.addBindValue(product.price);
-        query.addBindValue(total);
 
         if (!query.exec()) {
-            qDebug() << "Insert failed:" << query.lastError().text();
+            qDebug() << "Insert into invoice_items failed:" << query.lastError().text();
         }
     }
 
@@ -244,9 +284,9 @@ void MainWindow::showBillInMessageBox()
 
     double subtotal = 0.0;
     for (auto it = cart.begin(); it != cart.end(); ++it) {
-        int code = it.key();
+        int productId = it.key();
         int qty = it.value();
-        const Product &product = productCatalog[code];
+        const Product &product = productCatalog[productId];
         double total = product.price * qty;
         subtotal += total;
 
@@ -284,16 +324,16 @@ void MainWindow::on_removeButton_clicked()
     if (selectedRow >= 0) {
         QString productName = ui->tableCart->item(selectedRow, 0)->text();
 
-        int codeToRemove = -1;
+        int productIdToRemove = -1;
         for (auto it = productCatalog.begin(); it != productCatalog.end(); ++it) {
             if (it.value().name == productName) {
-                codeToRemove = it.key();
+                productIdToRemove = it.key();
                 break;
             }
         }
 
-        if (codeToRemove != -1) {
-            cart.remove(codeToRemove);
+        if (productIdToRemove != -1) {
+            cart.remove(productIdToRemove);
         }
 
         ui->tableCart->removeRow(selectedRow);
@@ -305,14 +345,29 @@ void MainWindow::on_removeButton_clicked()
 
 void MainWindow::on_buttonAdmin_clicked()
 {
-    bool ok;
-    QString password = QInputDialog::getText(this, "Admin Login", "Enter admin password:", QLineEdit::Password, "", &ok);
-    if (ok && password == "nivedck") {
-        AdminWindow *admin = new AdminWindow(this);
-        admin->exec();
-        loadProductsFromDatabase();
-    } else if (ok) {
-        QMessageBox::warning(this, "Access Denied", "Incorrect password.");
+    LoginDialog dialog(this);
+    if (dialog.exec() == QDialog::Accepted) {
+        QString username = dialog.username();
+        QString password = dialog.password();
+
+        QSqlQuery query;
+        query.prepare("SELECT password_hash FROM admins WHERE username = ?");
+        query.addBindValue(username);
+
+        if (query.exec() && query.next()) {
+            QString storedHash = query.value(0).toString();
+            QString enteredHash = QString(QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256).toHex());
+
+            if (storedHash == enteredHash) {
+                AdminWindow *admin = new AdminWindow(this);
+                admin->exec();
+                loadProductsFromDatabase();
+            } else {
+                QMessageBox::warning(this, "Access Denied", "Incorrect password.");
+            }
+        } else {
+            QMessageBox::warning(this, "Access Denied", "User not found.");
+        }
     }
 }
 
