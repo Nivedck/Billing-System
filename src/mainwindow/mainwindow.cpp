@@ -46,7 +46,11 @@ void MainWindow::connectToDatabase() {
     query.exec("CREATE TABLE IF NOT EXISTS products ("
                "product_id INTEGER PRIMARY KEY AUTOINCREMENT, "
                "name TEXT NOT NULL UNIQUE, "
-               "price REAL NOT NULL)");
+               "price REAL NOT NULL, "
+               "stock_quantity INTEGER NOT NULL DEFAULT 0)");
+
+    // Add stock_quantity column if it doesn't exist (for existing databases)
+    query.exec("ALTER TABLE products ADD COLUMN stock_quantity INTEGER NOT NULL DEFAULT 0");
 
     query.exec("CREATE TABLE IF NOT EXISTS invoices ("
                "invoice_id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -86,13 +90,14 @@ void MainWindow::loadProductsFromDatabase()
     ui->tableCatalog->setRowCount(0); // Clear existing rows
     productCatalog.clear(); // Clear existing product data
 
-    QSqlQuery query("SELECT product_id, name, price FROM products");
+    QSqlQuery query("SELECT product_id, name, price, stock_quantity FROM products");
     while (query.next()) {
         int productId = query.value(0).toInt();
         QString name = query.value(1).toString();
         double price = query.value(2).toDouble();
+        int stock = query.value(3).toInt();
 
-        productCatalog[productId] = {name, price};
+        productCatalog[productId] = {name, price, stock};
 
         int row = ui->tableCatalog->rowCount();
         ui->tableCatalog->insertRow(row);
@@ -144,33 +149,36 @@ void MainWindow::tryAddToCart()
     bool ok;
     int productId = input.toInt(&ok);
 
-    if (ok) {
-        if (productCatalog.contains(productId)) {
-            cart[productId] += qty;
-            updateCartDisplay();
-            updateTotals();
-        } else {
-            QMessageBox::warning(this, "Not Found", "Product ID not found.");
-        }
-    } else {
+    if (!ok) {
         QSqlQuery query;
-        query.prepare("SELECT product_id, price FROM products WHERE name = ?");
+        query.prepare("SELECT product_id, price, stock_quantity FROM products WHERE name = ?");
         query.addBindValue(input);
 
         if (query.exec() && query.next()) {
-            int productId = query.value(0).toInt();
+            productId = query.value(0).toInt();
             double price = query.value(1).toDouble();
-            cart[productId] += qty;
+            int stock = query.value(2).toInt();
 
             if (!productCatalog.contains(productId)) {
-                productCatalog[productId] = {input, price};
+                productCatalog[productId] = {input, price, stock};
             }
-
-            updateCartDisplay();
-            updateTotals();
         } else {
             QMessageBox::warning(this, "Not Found", "Product name not found.");
+            return;
         }
+    }
+
+    if (productCatalog.contains(productId)) {
+        int currentCartQty = cart.value(productId, 0);
+        if (currentCartQty + qty > productCatalog[productId].stock_quantity) {
+            QMessageBox::warning(this, "Out of Stock", QString("Not enough stock for %1. Available: %2").arg(productCatalog[productId].name).arg(productCatalog[productId].stock_quantity - currentCartQty));
+            return;
+        }
+        cart[productId] += qty;
+        updateCartDisplay();
+        updateTotals();
+    } else {
+        QMessageBox::warning(this, "Not Found", "Product ID not found.");
     }
 
     ui->lineEditProductName->clear();
@@ -258,6 +266,15 @@ void MainWindow::on_buttonCheckout_clicked()
         int qty = it.value();
         const Product& product = productCatalog[productId];
 
+        // Decrement stock quantity
+        QSqlQuery updateStockQuery;
+        updateStockQuery.prepare("UPDATE products SET stock_quantity = stock_quantity - ? WHERE product_id = ?");
+        updateStockQuery.addBindValue(qty);
+        updateStockQuery.addBindValue(productId);
+        if (!updateStockQuery.exec()) {
+            qDebug() << "Failed to decrement stock for product" << productId << ":" << updateStockQuery.lastError().text();
+        }
+
         query.prepare("INSERT INTO invoice_items (invoice_id, product_id, quantity, price_at_purchase) "
                       "VALUES (?, ?, ?, ?)");
         query.addBindValue(invoiceId);
@@ -275,6 +292,7 @@ void MainWindow::on_buttonCheckout_clicked()
     cart.clear();
     updateCartDisplay();
     updateTotals();
+    loadProductsFromDatabase(); // Refresh product catalog to show updated stock
 }
 
 void MainWindow::showBillInMessageBox()

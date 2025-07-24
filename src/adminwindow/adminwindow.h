@@ -21,6 +21,7 @@ private slots:
     void on_buttonAdd_clicked();
     void on_buttonAddAdmin_clicked();
     void on_buttonDeleteAdmin_clicked();
+    void on_buttonClearDatabase_clicked();
 
 
 private:

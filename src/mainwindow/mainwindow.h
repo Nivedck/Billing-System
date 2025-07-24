@@ -19,6 +19,7 @@ QT_END_NAMESPACE
 struct Product {
     QString name;
     double price;
+    int stock_quantity;
 };
 
 class MainWindow : public QMainWindow
