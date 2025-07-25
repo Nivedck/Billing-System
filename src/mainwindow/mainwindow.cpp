@@ -240,6 +240,11 @@ void MainWindow::on_buttonCheckout_clicked()
         return;
     }
 
+    QString customerName = ui->lineEditCustomerName->text().trimmed();
+    if (customerName.isEmpty()) {
+        customerName = "Walk-in Customer";
+    }
+
     double subtotal = 0.0;
     for (auto it = cart.begin(); it != cart.end(); ++it) {
         int productId = it.key();
@@ -252,7 +257,8 @@ void MainWindow::on_buttonCheckout_clicked()
     QSqlQuery query;
     QString date = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
 
-    query.prepare("INSERT INTO invoices (timestamp, total_amount) VALUES (?, ?)");
+    query.prepare("INSERT INTO invoices (customer_name, timestamp, total_amount) VALUES (?, ?, ?)");
+    query.addBindValue(customerName);
     query.addBindValue(date);
     query.addBindValue(totalAmount);
     if (!query.exec()) {
@@ -298,9 +304,15 @@ void MainWindow::on_buttonCheckout_clicked()
 
 void MainWindow::showBillInMessageBox()
 {
+    QString customerName = ui->lineEditCustomerName->text().trimmed();
+    if (customerName.isEmpty()) {
+        customerName = "Walk-in Customer";
+    }
+
     QString bill;
     bill += "========== Supermarket Bill ==========\n";
-    bill += QString("Date: %1\n\n").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
+    bill += QString("Date: %1\n").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"));
+    bill += QString("Customer: %1\n\n").arg(customerName);
     bill += "Item\tQty\tPrice\tTotal\n";
     bill += "--------------------------------------\n";
 
