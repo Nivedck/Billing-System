@@ -28,6 +28,7 @@ private:
     Ui::AdminWindow *ui;
     void loadProducts();
     void loadAdmins();
+    void loadTransactions();
 };
 
 #endif

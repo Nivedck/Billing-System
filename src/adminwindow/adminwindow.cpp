@@ -19,11 +19,29 @@ AdminWindow::AdminWindow(QWidget *parent)
 
     loadProducts();
     loadAdmins();
+    loadTransactions();
 }
 
 AdminWindow::~AdminWindow()
 {
     delete ui;
+}
+
+void AdminWindow::loadTransactions()
+{
+    ui->tableWidgetTransactions->setRowCount(0);
+
+    QSqlQuery query("SELECT invoice_id, customer_name, timestamp, total_amount FROM invoices ORDER BY timestamp DESC");
+
+    int row = 0;
+    while (query.next()) {
+        ui->tableWidgetTransactions->insertRow(row);
+        ui->tableWidgetTransactions->setItem(row, 0, new QTableWidgetItem(query.value(0).toString()));
+        ui->tableWidgetTransactions->setItem(row, 1, new QTableWidgetItem(query.value(1).toString()));
+        ui->tableWidgetTransactions->setItem(row, 2, new QTableWidgetItem(query.value(2).toString()));
+        ui->tableWidgetTransactions->setItem(row, 3, new QTableWidgetItem(QString("₹ %1").arg(query.value(3).toDouble(), 0, 'f', 2)));
+        row++;
+    }
 }
 
 void AdminWindow::loadProducts()
@@ -230,4 +248,5 @@ void AdminWindow::on_buttonClearDatabase_clicked()
     QMessageBox::information(this, "Success", "All database data cleared and default admin re-inserted.");
     loadProducts();
     loadAdmins();
+    loadTransactions();
 }
