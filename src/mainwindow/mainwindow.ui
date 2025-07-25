@@ -236,6 +236,20 @@
     <item>
      <layout class="QHBoxLayout" name="checkoutLayout">
       <item>
+       <widget class="QLabel" name="labelCustomerName">
+        <property name="text">
+         <string>Customer Name:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEditCustomerName">
+        <property name="placeholderText">
+         <string>Enter customer name</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer_5">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
