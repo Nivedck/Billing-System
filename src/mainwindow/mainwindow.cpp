@@ -54,6 +54,7 @@ void MainWindow::connectToDatabase() {
 
     query.exec("CREATE TABLE IF NOT EXISTS invoices ("
                "invoice_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+               "customer_name TEXT, "
                "timestamp TEXT NOT NULL, "
                "total_amount REAL NOT NULL)");
 
