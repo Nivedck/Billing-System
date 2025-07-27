@@ -16,7 +16,6 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , adminWindow(nullptr)
 {
     ui->setupUi(this);
     connectToDatabase();

@@ -52,7 +52,6 @@ private:
     void updateTotals();
     void connectToDatabase();
     void loadProductsFromDatabase();
-    AdminWindow *adminWindow;
     QCompleter *completer;
     QStringListModel *model;
     void setupAutoComplete();
