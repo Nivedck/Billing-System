@@ -259,8 +259,9 @@ void MainWindow::on_buttonCheckout_clicked()
 
     query.prepare("INSERT INTO invoices (customer_name, timestamp, total_amount) VALUES (?, ?, ?)");
     query.addBindValue(customerName);
-    query.addBindValue(date);
-    query.addBindValue(totalAmount);
+    query.addBindValue(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+    query.addBindValue(total);
+
     if (!query.exec()) {
         qDebug() << "Insert into invoices failed:" << query.lastError().text();
         return;
