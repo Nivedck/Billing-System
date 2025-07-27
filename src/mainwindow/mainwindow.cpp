@@ -43,21 +43,36 @@ void MainWindow::connectToDatabase() {
     }
 
     QSqlQuery query;
+    
+    // Create products table
     query.exec("CREATE TABLE IF NOT EXISTS products ("
                "product_id INTEGER PRIMARY KEY AUTOINCREMENT, "
                "name TEXT NOT NULL UNIQUE, "
                "price REAL NOT NULL, "
                "stock_quantity INTEGER NOT NULL DEFAULT 0)");
 
-    // Add stock_quantity column if it doesn't exist (for existing databases)
-    query.exec("ALTER TABLE products ADD COLUMN stock_quantity INTEGER NOT NULL DEFAULT 0");
+    // Check if stock_quantity column exists before adding it
+    QSqlQuery checkColumn;
+    checkColumn.exec("PRAGMA table_info(products)");
+    bool hasStockColumn = false;
+    while (checkColumn.next()) {
+        if (checkColumn.value(1).toString() == "stock_quantity") {
+            hasStockColumn = true;
+            break;
+        }
+    }
+    if (!hasStockColumn) {
+        query.exec("ALTER TABLE products ADD COLUMN stock_quantity INTEGER NOT NULL DEFAULT 0");
+    }
 
+    // Create invoices table
     query.exec("CREATE TABLE IF NOT EXISTS invoices ("
                "invoice_id INTEGER PRIMARY KEY AUTOINCREMENT, "
                "customer_name TEXT, "
                "timestamp TEXT NOT NULL, "
                "total_amount REAL NOT NULL)");
 
+    // Create invoice_items table
     query.exec("CREATE TABLE IF NOT EXISTS invoice_items ("
                "invoice_item_id INTEGER PRIMARY KEY AUTOINCREMENT, "
                "invoice_id INTEGER NOT NULL, "
@@ -67,6 +82,7 @@ void MainWindow::connectToDatabase() {
                "FOREIGN KEY(invoice_id) REFERENCES invoices(invoice_id), "
                "FOREIGN KEY(product_id) REFERENCES products(product_id))");
 
+    // Create admins table
     query.exec("CREATE TABLE IF NOT EXISTS admins ("
                "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                "username TEXT NOT NULL UNIQUE, "
@@ -82,7 +98,9 @@ void MainWindow::connectToDatabase() {
         query.prepare("INSERT INTO admins (username, password_hash) VALUES (?, ?)");
         query.addBindValue(defaultUsername);
         query.addBindValue(passwordHash);
-        query.exec();
+        if (!query.exec()) {
+            qDebug() << "Failed to create default admin:" << query.lastError().text();
+        }
     }
 }
 
@@ -105,6 +123,7 @@ void MainWindow::loadProductsFromDatabase()
         ui->tableCatalog->setItem(row, 0, new QTableWidgetItem(QString::number(productId)));
         ui->tableCatalog->setItem(row, 1, new QTableWidgetItem(name));
         ui->tableCatalog->setItem(row, 2, new QTableWidgetItem(QString("₹ %1").arg(price, 0, 'f', 2)));
+        ui->tableCatalog->setItem(row, 3, new QTableWidgetItem(QString::number(stock)));
     }
 
     ui->tableCatalog->verticalHeader()->setVisible(false);
@@ -128,8 +147,6 @@ void MainWindow::setupAutoComplete()
     model->setStringList(names);
 }
 
-
-
 void MainWindow::on_buttonAddToCart_clicked()
 {
     tryAddToCart();
@@ -139,7 +156,7 @@ void MainWindow::tryAddToCart()
 {
     QString input = ui->lineEditProductName->text().trimmed();
     QString qtyStr = ui->lineEditQuantity->text().trimmed();
-    int qty = qtyStr.toInt();
+    int qty = qtyStr.isEmpty() ? 1 : qtyStr.toInt();
     if (qty <= 0) qty = 1;
 
     if (input.isEmpty()) {
@@ -151,6 +168,7 @@ void MainWindow::tryAddToCart()
     int productId = input.toInt(&ok);
 
     if (!ok) {
+        // Search by name
         QSqlQuery query;
         query.prepare("SELECT product_id, price, stock_quantity FROM products WHERE name = ?");
         query.addBindValue(input);
@@ -172,7 +190,11 @@ void MainWindow::tryAddToCart()
     if (productCatalog.contains(productId)) {
         int currentCartQty = cart.value(productId, 0);
         if (currentCartQty + qty > productCatalog[productId].stock_quantity) {
-            QMessageBox::warning(this, "Out of Stock", QString("Not enough stock for %1. Available: %2").arg(productCatalog[productId].name).arg(productCatalog[productId].stock_quantity - currentCartQty));
+            QMessageBox::warning(this, "Out of Stock", 
+                QString("Not enough stock for %1. Available: %2, In cart: %3")
+                .arg(productCatalog[productId].name)
+                .arg(productCatalog[productId].stock_quantity)
+                .arg(currentCartQty));
             return;
         }
         cart[productId] += qty;
@@ -199,7 +221,7 @@ void MainWindow::updateCartDisplay()
         ui->tableCart->insertRow(row);
         ui->tableCart->setItem(row, 0, new QTableWidgetItem(product.name));
         ui->tableCart->setItem(row, 1, new QTableWidgetItem(QString::number(qty)));
-        ui->tableCart->setItem(row, 2 ,new QTableWidgetItem(QString("₹ %1").arg(product.price, 0, 'f', 2)));
+        ui->tableCart->setItem(row, 2, new QTableWidgetItem(QString("₹ %1").arg(product.price, 0, 'f', 2)));
         double total = product.price * qty;
         ui->tableCart->setItem(row, 3, new QTableWidgetItem(QString("₹ %1").arg(total, 0, 'f', 2)));
     }
@@ -254,52 +276,84 @@ void MainWindow::on_buttonCheckout_clicked()
     double tax = subtotal * 0.05;
     double totalAmount = subtotal + tax;
 
-    QSqlQuery query;
-    QString date = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+    // Start transaction
+    QSqlDatabase::database().transaction();
 
-    query.prepare("INSERT INTO invoices (customer_name, timestamp, total_amount) VALUES (?, ?, ?)");
-    query.addBindValue(customerName);
-    query.addBindValue(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-    query.addBindValue(total);
+    // Insert into invoices table
+    QSqlQuery invoiceQuery;
+    QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
 
-    if (!query.exec()) {
-        qDebug() << "Insert into invoices failed:" << query.lastError().text();
+    if (!invoiceQuery.prepare("INSERT INTO invoices (customer_name, timestamp, total_amount) VALUES (?, ?, ?)")) {
+        qDebug() << "Prepare invoice query failed:" << invoiceQuery.lastError().text();
+        QSqlDatabase::database().rollback();
         return;
     }
 
-    int invoiceId = query.lastInsertId().toInt();
+    invoiceQuery.addBindValue(customerName);
+    invoiceQuery.addBindValue(timestamp);
+    invoiceQuery.addBindValue(totalAmount);
 
+    if (!invoiceQuery.exec()) {
+        qDebug() << "Insert into invoices failed:" << invoiceQuery.lastError().text();
+        QSqlDatabase::database().rollback();
+        return;
+    }
+
+    int invoiceId = invoiceQuery.lastInsertId().toInt();
+
+    // Process each cart item
     for (auto it = cart.begin(); it != cart.end(); ++it) {
         int productId = it.key();
         int qty = it.value();
         const Product& product = productCatalog[productId];
 
-        // Decrement stock quantity
+        // Update stock quantity
         QSqlQuery updateStockQuery;
-        updateStockQuery.prepare("UPDATE products SET stock_quantity = stock_quantity - ? WHERE product_id = ?");
+        if (!updateStockQuery.prepare("UPDATE products SET stock_quantity = stock_quantity - ? WHERE product_id = ?")) {
+            qDebug() << "Prepare stock update failed:" << updateStockQuery.lastError().text();
+            QSqlDatabase::database().rollback();
+            return;
+        }
+        
         updateStockQuery.addBindValue(qty);
         updateStockQuery.addBindValue(productId);
+        
         if (!updateStockQuery.exec()) {
             qDebug() << "Failed to decrement stock for product" << productId << ":" << updateStockQuery.lastError().text();
+            QSqlDatabase::database().rollback();
+            return;
         }
 
-        query.prepare("INSERT INTO invoice_items (invoice_id, product_id, quantity, price_at_purchase) "
-                      "VALUES (?, ?, ?, ?)");
-        query.addBindValue(invoiceId);
-        query.addBindValue(productId);
-        query.addBindValue(qty);
-        query.addBindValue(product.price);
+        // Insert into invoice_items
+        QSqlQuery itemQuery;
+        if (!itemQuery.prepare("INSERT INTO invoice_items (invoice_id, product_id, quantity, price_at_purchase) VALUES (?, ?, ?, ?)")) {
+            qDebug() << "Prepare invoice_items query failed:" << itemQuery.lastError().text();
+            QSqlDatabase::database().rollback();
+            return;
+        }
 
-        if (!query.exec()) {
-            qDebug() << "Insert into invoice_items failed:" << query.lastError().text();
+        itemQuery.addBindValue(invoiceId);
+        itemQuery.addBindValue(productId);
+        itemQuery.addBindValue(qty);
+        itemQuery.addBindValue(product.price);
+
+        if (!itemQuery.exec()) {
+            qDebug() << "Insert into invoice_items failed:" << itemQuery.lastError().text();
+            QSqlDatabase::database().rollback();
+            return;
         }
     }
 
+    // Commit transaction
+    QSqlDatabase::database().commit();
+
     showBillInMessageBox();
     QMessageBox::information(this, "Checkout", "Purchase completed and saved!");
+    
     cart.clear();
     updateCartDisplay();
     updateTotals();
+    ui->lineEditCustomerName->clear();
     loadProductsFromDatabase(); // Refresh product catalog to show updated stock
 }
 
@@ -342,14 +396,15 @@ void MainWindow::showBillInMessageBox()
     bill += "======================================\n";
     bill += "      Thank you for shopping with us!\n";
 
-    QMessageBox *msgBox = new QMessageBox(this);
-    msgBox->setWindowTitle("Bill");
-    msgBox->setTextFormat(Qt::PlainText);
-    msgBox->setText(bill);
-    msgBox->setStandardButtons(QMessageBox::Ok);
-    msgBox->setMinimumSize(600, 400);
-    msgBox->setStyleSheet("QLabel{min-width: 580px; min-height: 360px;}");
-    msgBox->exec();
+    // Fixed memory management - use stack allocation
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle("Bill");
+    msgBox.setTextFormat(Qt::PlainText);
+    msgBox.setText(bill);
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setMinimumSize(600, 400);
+    msgBox.setStyleSheet("QLabel{min-width: 580px; min-height: 360px;}");
+    msgBox.exec();
 }
 
 void MainWindow::on_removeButton_clicked()
@@ -369,10 +424,9 @@ void MainWindow::on_removeButton_clicked()
 
         if (productIdToRemove != -1) {
             cart.remove(productIdToRemove);
+            updateCartDisplay();
+            updateTotals();
         }
-
-        ui->tableCart->removeRow(selectedRow);
-        updateTotals();
     } else {
         QMessageBox::warning(this, "No Selection", "Please select an item to remove.");
     }
@@ -396,7 +450,9 @@ void MainWindow::on_buttonAdmin_clicked()
             if (storedHash == enteredHash) {
                 AdminWindow *admin = new AdminWindow(this);
                 admin->exec();
+                delete admin; // Proper cleanup
                 loadProductsFromDatabase();
+                setupAutoComplete(); // Refresh autocomplete after admin changes
             } else {
                 QMessageBox::warning(this, "Access Denied", "Incorrect password.");
             }
@@ -408,27 +464,28 @@ void MainWindow::on_buttonAdmin_clicked()
 
 void MainWindow::on_buttonRefreshCatalog_clicked()
 {
-    ui->tableCatalog->setRowCount(0);
-    productCatalog.clear();
     loadProductsFromDatabase();
+    setupAutoComplete();
 }
 
 void MainWindow::recalculateTotals() {
     double subtotal = 0.0;
-
     int rowCount = ui->tableCart->rowCount();
 
     for (int row = 0; row < rowCount; ++row) {
         QTableWidgetItem *totalItem = ui->tableCart->item(row, 3);
         if (totalItem) {
-            subtotal += totalItem->text().toDouble();
+            QString totalText = totalItem->text();
+            // Remove currency symbol and convert
+            totalText.remove("₹ ");
+            subtotal += totalText.toDouble();
         }
     }
 
     double tax = subtotal * 0.05;
     double grandTotal = subtotal + tax;
 
-    ui->labelSubtotal->setText(QString::number(subtotal, 'f', 2));
-    ui->labelTax->setText(QString::number(tax, 'f', 2));
-    ui->labelTotal->setText(QString::number(grandTotal, 'f', 2));
+    ui->labelSubtotal->setText(QString("Subtotal: ₹ %1").arg(subtotal, 0, 'f', 2));
+    ui->labelTax->setText(QString("Tax (5%): ₹ %1").arg(tax, 0, 'f', 2));
+    ui->labelTotal->setText(QString("Total: ₹ %1").arg(grandTotal, 0, 'f', 2));
 }
